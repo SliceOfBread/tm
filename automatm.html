@@ -1,0 +1,602 @@
+<!doctype html>
+
+<html>
+<head>
+	<title>AutomaTM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="shortcut icon"
+ href="http://sliceofbread.neocities.org/tm/mars.ico">
+<!--
+ Copyright 2019 SliceOfBread
+-->
+<style>
+* {box-sizing: border-box}
+
+body {
+  font-family: "Arial", sans-serif;
+}
+
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+    
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+  
+th, td {
+  padding: 5px;
+}
+
+select {
+  padding: 5px;
+}
+
+#firstelement {
+    width:900px;
+}
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  float: left;
+  display: none;
+  padding: 2px 2px;
+  border: 1px solid #ccc;
+  border-left: none;
+  
+}
+
+input[type=text] {
+  padding: 0px;
+  font-family:Arial, sans-serif;font-size:28px;
+  margin: 0;}
+  
+select {
+  font-family:Arial, sans-serif;font-size:28px;
+}
+  
+.c_heat{background-color:#cb0000;color:#fcff2f;padding:5px;}
+
+img{vertical-align: text-bottom;}
+
+.tg  {border-collapse:collapse;border-spacing:0;float:left;overflow:hidden;text-align:center;width:100%}
+.tg2  {border-collapse:separate;border-spacing:2px;float:left;overflow:hidden;text-align:center;}
+.tg td{font-family:Arial, sans-serif;font-size:28px;padding:5px 2px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;font-weight:bold;}
+.tg .tg-zkpc{background-color:#f8ff00;border-color:inherit;vertical-align:bottom}
+.tg .tg-ueh4{background-color:#036400;color:#ffffff;border-color:inherit;}
+.tg .tg-dkta{background-color:#f56b00;border-color:inherit;font-size:28px;}
+.tg .tg-h3ms{background-color:#986536;border-color:inherit;}
+.tg .tg-utck{background-color:#6434fc;color:#fcff2f;border-color:inherit;}
+.tg .tg-fll1{border-color:inherit;vertical-align:bottom;font-size:20px;}
+.tg .tg-fll5{border-color:inherit;vertical-align:bottom;}
+.tg .tg-flq1{background-color:#f56b00;border-color:inherit;vertical-align:bottom}
+.tg .tg-flq2{background-color:grey;border-color:inherit;vertical-align:bottom}
+.tg .tg-na3n{background-color:#986536;color:#000000;border-color:inherit;vertical-align:bottom}
+.tg .tg-na4n{background-color:#ffffff;color:#000000;border-color:inherit;vertical-align:bottom}
+.tg .tg-0fbn{background-color:#000000;color:#fcff2f;border-color:inherit;vertical-align:bottom}
+.tg .tg-htk3{background-color:#036400;color:#ffffff;border-color:inherit;vertical-align:bottom}
+.tg .tg-ij73{background-color:#6434fc;color:#fcff2f;border-color:inherit;vertical-align:bottom}
+.tg .tg-q3gy{background-color:#cb0000;color:#fcff2f;border-color:inherit;vertical-align:bottom}
+.tg .tg-xldj{border-color:inherit;text-align:left}
+.tg .tg-vhu3{background-color:#f8ff00;border-color:inherit;}
+.tg .tg-m8w8{background-color:#000000;color:#fcff2f;border-color:inherit;}
+.tg .tg-dl61{background-color:#cb0000;color:#fcff2f;border-color:inherit;}
+.tg .tg-quj2{border-color:inherit;}
+.tg .tg-quj4{border-color:inherit;}
+.tg .tg-prod{background-color:white;color:black}
+.tg td span{font-size:20px;}
+
+.tg td div{font-size:28px;}
+.tg td div span{font-size:28px;}
+
+button {background:none;font-size:28px;color:inherit;border-width:0px;padding:1px 3px}
+.tg-fll1 button{border-width:1px}
+.tg .tg-prod button{background:inherit;color:#000000;font-size:20px;}
+.tg .tg-gp button{border-width:1px; background:inherit;color:#000000;font-size:20px;}
+button.invis {border:none;}
+button.blog {border-width:2px}
+
+.tg2  {border-collapse:separate;margin:0px auto;border-spacing:5px}
+.tg2 td{font-family:Arial, sans-serif;font-size:30px;padding:5px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg2 .tg-s268{text-align:center; width:70px}
+.tg2 .tg-rslt{text-align:right}
+.tg2 button{padding:5px 15px;font-size:24px;border:none;}
+
+.bigbutt {padding:10px 20px;font-size:30px;border-width:2px}
+</style>
+</head>
+<body>
+<div id="firstelement" style="padding:5px">
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'Play')">Play</button>
+      <button class="tablinks" onclick="openTab(event, 'Setup')" id="defaultOpen">Setup</button>
+      <button class="tablinks" onclick="openTab(event, 'Log')">Log</button>
+      <button class="tablinks" onclick="openTab(event, 'Score')">Score</button>
+      <button class="tablinks" onclick="openTab(event, 'Help')">Help</button>
+    </div>
+    <div id="Play" class="tabcontent" style="width:100%">
+        <table id="temperature">
+            <tr><td class="blog"><img src="temp.png" alt="Tmp" height="20px">Temp</td>
+            <td id="sctemp-30">-30</td>
+            <td id="sctemp-28">-28</td><td id="sctemp-26">-26</td><td id="sctemp-24">-24<span class="c_heat"><img src="heat.png" alt="H" height="18px"></span></td><td id="sctemp-22">-22</td><td id="sctemp-20">-20<span class="c_heat"><img src="heat.png" alt="H" height="18px"></span></td>
+            <td id="sctemp-18">-18</td><td id="sctemp-16">-16</td><td id="sctemp-14">-14</td><td id="sctemp-12">-12</td><td id="sctemp-10">-10</td>
+            <td id="sctemp-8">-8</td><td id="sctemp-6">-6</td><td id="sctemp-4">-4</td><td id="sctemp-2">-2</td><td id="sctemp0">0<img src="wave.png" alt="Oc" height="20px"></td>
+            <td id="sctemp2">2</td><td id="sctemp4">4</td><td id="sctemp6">6</td><td id="sctemp8">8</td>
+            </tr>
+        </table>
+        <table id="o2" style="display:inline; overflow:hidden; float:left">
+            <tr><td>O&#x2082; %</td>
+            <td id="scO20">0</td><td id="scO21">1</td><td id="scO22">2</td><td id="scO23">3</td>
+            <td id="scO24">4</td><td id="scO25">5</td><td id="scO26">6</td><td id="scO27">7</td>
+            <td id="scO28">8<img src="temp.png" alt="Tmp" height="20px"></td><td id="scO29">9</td><td id="scO210">10</td><td id="scO211">11</td>
+            <td id="scO212">12</td><td id="scO213">13</td><td id="scO214">14</td>
+            </tr>
+        </table>
+        <table id="oceans" style="display:inline; overflow:hidden; float:right">
+            <tr>
+                <td id="scoceans">9</td>
+                <td><img src="wave.png" alt="Oc" height="20px"> Oceans left</td>
+            </tr>
+        </table>
+<br>
+        <table id="manda" class="tg tg2">
+            <tr id="milestones">
+                <td>Milestones <span style="font-size:14px">8&euro;</span></td>
+                <td class="tg-flq1 manda" onclick="clickFund(this)" id="terraformer">35 <img src="globe.png" alt="G" height="30px"></td>
+                <td class="tg-flq2 manda" onclick="clickFund(this)" id="mayor">3 <img src="city.png" alt="C" height="30px"></td>
+                <td class="tg-htk3 manda" onclick="clickFund(this)" id="gardener">3 <img src="plant.png" alt="P" height="30px"></td>
+                <td class="tg-na3n manda" onclick="clickFund(this)" id="builder">8 <img src="building.png" alt="B" height="30px"></td>
+                <td class="tg-na4n manda" onclick="clickFund(this)" id="planner">16 <img src="card.png" alt="[]" height="30px"></td>
+            </tr>
+            <tr id="awards" style="display:none">
+                <td>Awards <span style="font-size:14px">8&euro;/14&euro;/20&euro;</span></td>
+                <td class="manda" id="landlord" onclick="clickFund(this)">Landlord</td>
+                <td class="manda" id="banker" onclick="clickFund(this)">Banker</td>
+                <td class="manda" id="scientist" onclick="clickFund(this)">Scientist</td>
+                <td class="manda" id="thermalist" onclick="clickFund(this)">Thermalist</td>
+                <td class="manda" id="miner" onclick="clickFund(this)">Miner</td>
+            </tr>
+        </table>
+        <br>
+        <table class="tg">
+          <tr>
+            <th class="tg-fll1" colspan="2">Generation:<button id="genbutton" onclick="clickProduction(this);">1</button></th>
+            <th class="tg-flq1"><img src="globe.png" alt="G" height="30px"><br>TR</th>
+            <th class="tg-zkpc">&euro;</th>
+            <th class="tg-na3n"><img src="steel.png" alt="S" height="30px"><br>Steel</th>
+            <th class="tg-0fbn"><img src="titanium.png" alt="T" height="30px"><br>Titanium</th>
+            <th class="tg-htk3"><img src="plant.png" alt="P" height="30px"><br>Plants</th>
+            <th class="tg-ij73"><img src="energy.png" alt="E" height="30px"><br>Energy</th>
+            <th class="tg-q3gy"><img src="heat.png" alt="H" height="30px"><br>Heat</th>
+          </tr>
+          <tr id="player1">
+            <td class="tg-xldj" id="pn1" rowspan="2" onclick="clickPlayer(1)">Player 1</td>
+            <td class="tg-quj2" rowspan="2" onclick="clickPlaceTile(1)">Place<br>Tile</td>
+            <td class="tg-dkta"><div><button onclick="clickProdLess('p1b6')">&#x25BC;</button><span id="p1b6">20</span><button onclick="clickProdMore('p1b6')">&#x25B2;</button></div></td>
+            <td class="tg-vhu3" id="a1b0" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-h3ms" id="a1b1" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-m8w8" id="a1b2" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-ueh4" id="a1b3" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-utck" id="a1b4" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-dl61" id="a1b5" onclick="clickSpendGain(event, this)">0</td>
+          </tr>
+          <tr id="player12">
+            <td class="tg-gp"><input type="checkbox" id="passbox1" disabled>&nbsp;&nbsp;<button onclick="clickIncTemp(1)"><img src="temp.png" alt="Tmp" height="20px"></button>&nbsp;&nbsp;<button onclick="clickIncO2(1)">O&#x2082;</button></td>
+            <td class="tg-vhu3 tg-prod"><button onclick="clickProdLess('p1b0')">&#x25BC;</button><span id="p1b0">0</span><button onclick="clickProdMore('p1b0')">&#x25B2;</button></td>
+            <td class="tg-h3ms tg-prod"><button onclick="clickProdLess('p1b1')">&#x25BC;</button><span id="p1b1">0</span><button onclick="clickProdMore('p1b1')">&#x25B2;</button></td>
+            <td class="tg-m8w8 tg-prod"><button onclick="clickProdLess('p1b2')">&#x25BC;</button><span id="p1b2">0</span><button onclick="clickProdMore('p1b2')">&#x25B2;</button></td>
+            <td class="tg-ueh4 tg-prod"><button onclick="clickProdLess('p1b3')">&#x25BC;</button><span id="p1b3">0</span><button onclick="clickProdMore('p1b3')">&#x25B2;</button></td>
+            <td class="tg-utck tg-prod"><button onclick="clickProdLess('p1b4')">&#x25BC;</button><span id="p1b4">0</span><button onclick="clickProdMore('p1b4')">&#x25B2;</button></td>
+            <td class="tg-dl61 tg-prod"><button onclick="clickProdLess('p1b5')">&#x25BC;</button><span id="p1b5">0</span><button onclick="clickProdMore('p1b5')">&#x25B2;</button></td>
+          </tr>
+          <tr id="player2">
+            <td class="tg-xldj" id="pn2" rowspan="2" onclick="clickPlayer(2)">Automa2</td>
+            <td class="tg-quj2" rowspan="2" onclick="clickPlaceTile(2)">Place<br>Tile</td>
+            <td class="tg-dkta"><div><button onclick="clickProdLess('p2b6')">&#x25BC;</button><span id="p2b6">20</span><button onclick="clickProdMore('p2b6')">&#x25B2;</button></div></td>
+            <td class="tg-vhu3" id="a2b0" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-h3ms" id="a2b1" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-m8w8" id="a2b2" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-ueh4" id="a2b3" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-utck" id="a2b4" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-dl61" id="a2b5" onclick="clickSpendGain(event, this)">0</td>
+          </tr>
+          <tr id="player22">
+            <td class="tg-gp"><input type="checkbox" id="passbox2" disabled>&nbsp;&nbsp;<button onclick="clickIncTemp(2)"><img src="temp.png" alt="Tmp" height="20px"></button>&nbsp;&nbsp;<button onclick="clickIncO2(2)">O&#x2082;</button></td>
+            <td class="tg-vhu3 tg-prod"><button onclick="clickProdLess('p2b0')">&#x25BC;</button><span id="p2b0">0</span><button onclick="clickProdMore('p2b0')">&#x25B2;</button></td>
+            <td class="tg-h3ms tg-prod"><button onclick="clickProdLess('p2b1')">&#x25BC;</button><span id="p2b1">0</span><button onclick="clickProdMore('p2b1')">&#x25B2;</button></td>
+            <td class="tg-m8w8 tg-prod"><button onclick="clickProdLess('p2b2')">&#x25BC;</button><span id="p2b2">0</span><button onclick="clickProdMore('p2b2')">&#x25B2;</button></td>
+            <td class="tg-ueh4 tg-prod"><button onclick="clickProdLess('p2b3')">&#x25BC;</button><span id="p2b3">0</span><button onclick="clickProdMore('p2b3')">&#x25B2;</button></td>
+            <td class="tg-utck tg-prod"><button onclick="clickProdLess('p2b4')">&#x25BC;</button><span id="p2b4">0</span><button onclick="clickProdMore('p2b4')">&#x25B2;</button></td>
+            <td class="tg-dl61 tg-prod"><button onclick="clickProdLess('p2b5')">&#x25BC;</button><span id="p2b5">0</span><button onclick="clickProdMore('p2b5')">&#x25B2;</button></td>
+          </tr>
+          <tr id="player3">
+            <td class="tg-xldj" id="pn3" rowspan="2" onclick="clickPlayer(3)">Automa3</td>
+            <td class="tg-quj2" rowspan="2" onclick="clickPlaceTile(3)">Place<br>Tile</td>
+            <td class="tg-dkta"><div><button onclick="clickProdLess('p3b6')">&#x25BC;</button><span id="p3b6">20</span><button onclick="clickProdMore('p3b6')">&#x25B2;</button></div></td>
+            <td class="tg-vhu3" id="a3b0" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-h3ms" id="a3b1" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-m8w8" id="a3b2" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-ueh4" id="a3b3" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-utck" id="a3b4" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-dl61" id="a3b5" onclick="clickSpendGain(event, this)">0</td>
+          </tr>
+          <tr id="player32">
+            <td class="tg-gp"><input type="checkbox" id="passbox3" disabled>&nbsp;&nbsp;<button onclick="clickIncTemp(3)"><img src="temp.png" alt="Tmp" height="20px"></button>&nbsp;&nbsp;<button onclick="clickIncO2(3)">O&#x2082;</button></td>
+            <td class="tg-vhu3 tg-prod"><button onclick="clickProdLess('p3b0')">&#x25BC;</button><span id="p3b0">0</span><button onclick="clickProdMore('p3b0')">&#x25B2;</button></td>
+            <td class="tg-h3ms tg-prod"><button onclick="clickProdLess('p3b1')">&#x25BC;</button><span id="p3b1">0</span><button onclick="clickProdMore('p3b1')">&#x25B2;</button></td>
+            <td class="tg-m8w8 tg-prod"><button onclick="clickProdLess('p3b2')">&#x25BC;</button><span id="p3b2">0</span><button onclick="clickProdMore('p3b2')">&#x25B2;</button></td>
+            <td class="tg-ueh4 tg-prod"><button onclick="clickProdLess('p3b3')">&#x25BC;</button><span id="p3b3">0</span><button onclick="clickProdMore('p3b3')">&#x25B2;</button></td>
+            <td class="tg-utck tg-prod"><button onclick="clickProdLess('p3b4')">&#x25BC;</button><span id="p3b4">0</span><button onclick="clickProdMore('p3b4')">&#x25B2;</button></td>
+            <td class="tg-dl61 tg-prod"><button onclick="clickProdLess('p3b5')">&#x25BC;</button><span id="p3b5">0</span><button onclick="clickProdMore('p3b5')">&#x25B2;</button></td>
+          </tr>
+          <tr id="player4">
+            <td class="tg-xldj" id="pn4" rowspan="2" onclick="clickPlayer(4)">Automa4</td>
+            <td class="tg-quj2" rowspan="2" onclick="clickPlaceTile(4)">Place<br>Tile</td>
+            <td class="tg-dkta"><div><button onclick="clickProdLess('p4b6')">&#x25BC;</button><span id="p4b6">20</span><button onclick="clickProdMore('p4b6')">&#x25B2;</button></div></td>
+            <td class="tg-vhu3" id="a4b0" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-h3ms" id="a4b1" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-m8w8" id="a4b2" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-ueh4" id="a4b3" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-utck" id="a4b4" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-dl61" id="a4b5" onclick="clickSpendGain(event, this)">0</td>
+          </tr>
+          <tr id="player42">
+            <td class="tg-gp"><input type="checkbox" id="passbox4" disabled>&nbsp;&nbsp;<button onclick="clickIncTemp(4)"><img src="temp.png" alt="Tmp" height="20px"></button>&nbsp;&nbsp;<button onclick="clickIncO2(4)">O&#x2082;</button></td>
+            <td class="tg-vhu3 tg-prod"><button onclick="clickProdLess('p4b0')">&#x25BC;</button><span id="p4b0">0</span><button onclick="clickProdMore('p4b0')">&#x25B2;</button></td>
+            <td class="tg-h3ms tg-prod"><button onclick="clickProdLess('p4b1')">&#x25BC;</button><span id="p4b1">0</span><button onclick="clickProdMore('p4b1')">&#x25B2;</button></td>
+            <td class="tg-m8w8 tg-prod"><button onclick="clickProdLess('p4b2')">&#x25BC;</button><span id="p4b2">0</span><button onclick="clickProdMore('p4b2')">&#x25B2;</button></td>
+            <td class="tg-ueh4 tg-prod"><button onclick="clickProdLess('p4b3')">&#x25BC;</button><span id="p4b3">0</span><button onclick="clickProdMore('p4b3')">&#x25B2;</button></td>
+            <td class="tg-utck tg-prod"><button onclick="clickProdLess('p4b4')">&#x25BC;</button><span id="p4b4">0</span><button onclick="clickProdMore('p4b4')">&#x25B2;</button></td>
+            <td class="tg-dl61 tg-prod"><button onclick="clickProdLess('p4b5')">&#x25BC;</button><span id="p4b5">0</span><button onclick="clickProdMore('p4b5')">&#x25B2;</button></td>
+          </tr>
+          <tr id="player5">
+            <td class="tg-xldj" id="pn5" rowspan="2" onclick="clickPlayer(5)">Automa5</td>
+            <td class="tg-quj2" rowspan="2" onclick="clickPlaceTile(5)">Place<br>Tile</td>
+            <td class="tg-dkta"><div><button onclick="clickProdLess('p5b6')">&#x25BC;</button><span id="p5b6">20</span><button onclick="clickProdMore('p5b6')">&#x25B2;</button></div></td>
+            <td class="tg-vhu3" id="a5b0" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-h3ms" id="a5b1" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-m8w8" id="a5b2" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-ueh4" id="a5b3" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-utck" id="a5b4" onclick="clickSpendGain(event, this)">0</td>
+            <td class="tg-dl61" id="a5b5" onclick="clickSpendGain(event, this)">0</td>
+          </tr>
+          <tr id="player52">
+            <td class="tg-gp"><input type="checkbox" id="passbox5" disabled>&nbsp;&nbsp;<button onclick="clickIncTemp(5)"><img src="temp.png" alt="Tmp" height="20px"></button>&nbsp;&nbsp;<button onclick="clickIncO2(5)">O&#x2082;</button></td>
+            <td class="tg-vhu3 tg-prod"><button onclick="clickProdLess('p5b0')">&#x25BC;</button><span id="p5b0">0</span><button onclick="clickProdMore('p5b0')">&#x25B2;</button></td>
+            <td class="tg-h3ms tg-prod"><button onclick="clickProdLess('p5b1')">&#x25BC;</button><span id="p5b1">0</span><button onclick="clickProdMore('p5b1')">&#x25B2;</button></td>
+            <td class="tg-m8w8 tg-prod"><button onclick="clickProdLess('p5b2')">&#x25BC;</button><span id="p5b2">0</span><button onclick="clickProdMore('p5b2')">&#x25B2;</button></td>
+            <td class="tg-ueh4 tg-prod"><button onclick="clickProdLess('p5b3')">&#x25BC;</button><span id="p5b3">0</span><button onclick="clickProdMore('p5b3')">&#x25B2;</button></td>
+            <td class="tg-utck tg-prod"><button onclick="clickProdLess('p5b4')">&#x25BC;</button><span id="p5b4">0</span><button onclick="clickProdMore('p5b4')">&#x25B2;</button></td>
+            <td class="tg-dl61 tg-prod"><button onclick="clickProdLess('p5b5')">&#x25BC;</button><span id="p5b5">0</span><button onclick="clickProdMore('p5b5')">&#x25B2;</button></td>
+          </tr>
+        </table>
+        <table id="spendgain" class="tg2" style="display:none">
+          <tr>
+            <td class="tg-s268"><button onclick="clickCalcButton(this)">x</button></td>  
+            <td id="spendgaintype" class="tg-s268" colspan="3">Steel</td>
+          </tr>
+          <tr>
+            <td id="spendgainamt" class="tg-rslt" colspan="4">0</td>
+<!--
+            <td class="tg-s268"><button onclick="clickCalcButton(this)">=</button></td>
+-->
+          </tr>
+          <tr>
+            <td class="tg-s268" onclick="clickCalcButton(this)">7</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">8</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">9</td>
+            <td class="tg-s268" rowspan="2" onclick="clickCalcButton(this)">-</td>
+          </tr>
+          <tr>
+            <td class="tg-s268" onclick="clickCalcButton(this)">4</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">5</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">6</td>
+          </tr>
+          <tr>
+            <td class="tg-s268" onclick="clickCalcButton(this)">1</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">2</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">3</td>
+            <td class="tg-s268" rowspan="2" onclick="clickCalcButton(this)">+</td>
+          </tr>
+          <tr>
+            <td class="tg-s268" colspan="2" onclick="clickCalcButton(this)">0</td>
+            <td class="tg-s268" onclick="clickCalcButton(this)">C</td>
+          </tr>
+        </table>
+        <select id="selecttile"  style="background:blue;color:white;display:none" class="bigbutt" onchange="changeTile(this);">
+            <option value="Ocean" style="background:blue;color:white" selected>Ocean</option>
+            <option value="City" style="background:grey;color:black">City</option>
+            <option value="Greenery" style="background:green;color:white">Greenery</option>
+            <option value="Capital" style="background:white;color:black">Capital</option>
+            <option value="CommercialDistrict" style="background:#802b00;color:black">Commercial District</option>
+            <option value="EcologicalZone" style="background:#802b00;color:black">Ecological Zone</option>
+            <option value="IndustrialCenter" style="background:#802b00;color:black">Industrial Center</option>
+            <option value="LavaFlows" style="background:#802b00;color:black">Lava Flows</option>
+            <option value="MiningArea" style="background:#802b00;color:black">Mining Area</option>
+            <option value="MiningRights" style="background:#802b00;color:black">Mining Rights</option>
+            <option value="MoholeArea" style="background:#802b00;color:black">Mohole Area</option>
+            <option value="NaturalPreserve" style="background:#802b00;color:black">Natural Preserve</option>
+            <option value="NuclearZone" style="background:#802b00;color:black">Nuclear Zone</option>
+            <option value="RestrictedArea" style="background:#802b00;color:black">Restricted Area</option>
+        </select>
+        <button id="selecttilecancel" class="bigbutt" onclick="clickCancel(this)" style="display:none">Cancel</button>
+        <br>
+        <div id="oceanmsg" onclick="this.style.display='none';" style="display:none;font-size:28px;float:left;">P1 builds an ocean
+        </div>
+        <div id="clickawaymsg" onclick="this.style.display='none';" style="display:none;font-size:28px;float:left;">takes a card
+        </div>
+    </div>
+    <div id="Setup" class="tabcontent">
+        <select id="selectplayers" onchange="changeNumPlayers(this.value);">
+            <option value="2">2 Players</option>
+            <option value="3" selected>3 Players</option>
+            <option  value="4">4 Players</option>
+            <option  value="5">5 Players</option>
+        </select>
+        <select id="randomize" onchange="randomizeOptions()">
+            <option value="0" selected>0 - Easiest</option>
+            <option value="1">1 - Easy</option>
+            <option value="2">2 - Medium</option>
+            <option value="3">3 - Tough</option>
+            <option value="4">4 - Very Hard</option>
+            <option value="5">5 - Hardest</option>
+        </select>
+        <br>
+        <input type="checkbox" id="botcheck1" onchange="changeBotCheck(1)" checked>
+        <input id="tname1" type="text" disabled onfocusout="nameDone(1)" value="Automa1" size="12">
+        <select id="selectcolorp1" onchange="changePlayerColor(this);">
+            <option value="red" selected>Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="black">Black</option>
+        </select>
+        <br>
+        <input type="checkbox" id="botcheck2" onchange="changeBotCheck(2)" checked>
+        <input id="tname2" type="text" disabled onfocusout="nameDone(2)" value="Automa2" size="12">
+        <select id="selectcolorp2" onchange="changePlayerColor(this);">
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue" selected>Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="black">Black</option>
+        </select>
+        <br>
+        <input type="checkbox" id="botcheck3" onchange="changeBotCheck(3)" checked>
+        <input id="tname3" type="text" disabled onfocusout="nameDone(3)" value="Automa3" size="12">
+        <select id="selectcolorp3" onchange="changePlayerColor(this);">
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="yellow" selected>Yellow</option>
+            <option value="black">Black</option>
+        </select>
+        <br>
+        <input type="checkbox" id="botcheck4" onchange="changeBotCheck(4)" checked>
+        <input id="tname4" type="text" disabled value="Automa4" size="12">
+        <select id="selectcolorp4" onchange="changePlayerColor(this);">
+            <option value="red">Red</option>
+            <option value="green" selected>Green</option>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="black">Black</option>
+        </select>
+        <br>
+        <input type="checkbox" id="botcheck5" onchange="changeBotCheck(5)" checked>
+        <input id="tname5" type="text" disabled value="Automa5" size="12">
+        <select id="selectcolorp5" onchange="changePlayerColor(this);">
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="black" selected>Black</option>
+        </select>
+        <br>
+        <table class="tg">
+            <tr>
+                <th>-20:4</th>
+                <th>7->Greenery</th>
+                <th><img src="steel.png" alt="S" height="30px">/<img src="titanium.png" alt="T" height="30px">:Prod<img src="steel.png" alt="S" height="30px"></th>
+                <th>Any<img src="city.png" alt="B" height="30px">:Prod 1 &euro;</th>
+                <th>3&euro;->TR</th>
+            </tr>
+            <tr id="benpl1">
+                <td><input type="checkbox" id="ben1b0"></td>
+                <td><input type="checkbox" id="ben1b1"></td>
+                <td><input type="checkbox" id="ben1b2"></td>
+                <td><input type="checkbox" id="ben1b3"></td>
+                <td><input type="checkbox" id="ben1b4"></td>
+            </tr>
+            <tr id="benpl2">
+                <td><input type="checkbox" id="ben2b0"></td>
+                <td><input type="checkbox" id="ben2b1"></td>
+                <td><input type="checkbox" id="ben2b2"></td>
+                <td><input type="checkbox" id="ben2b3"></td>
+                <td><input type="checkbox" id="ben2b4"></td>
+            </tr>
+            <tr id="benpl3">
+                <td><input type="checkbox" id="ben3b0"></td>
+                <td><input type="checkbox" id="ben3b1"></td>
+                <td><input type="checkbox" id="ben3b2"></td>
+                <td><input type="checkbox" id="ben3b3"></td>
+                <td><input type="checkbox" id="ben3b4"></td>
+            </tr>
+            <tr id="benpl4">
+                <td><input type="checkbox" id="ben4b0"></td>
+                <td><input type="checkbox" id="ben4b1"></td>
+                <td><input type="checkbox" id="ben4b2"></td>
+                <td><input type="checkbox" id="ben4b3"></td>
+                <td><input type="checkbox" id="ben4b4"></td>
+            </tr>
+            <tr id="benpl5">
+                <td><input type="checkbox" id="ben5b0"></td>
+                <td><input type="checkbox" id="ben5b1"></td>
+                <td><input type="checkbox" id="ben5b2"></td>
+                <td><input type="checkbox" id="ben5b3"></td>
+                <td><input type="checkbox" id="ben5b4"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="Log" class="tabcontent">
+        <textarea id="gamelog" rows="10" cols="80"></textarea><br>
+        <button class="blog" onclick="clickUndo()">Undo 1 Move</button><br>
+        <textarea id="history" rows="10" cols="30"></textarea>
+        <button class="blog" onclick="clickLoad()">Load</button><button class="blog" onclick="clickApply()">Apply</button><button class="blog" onclick="clickClear()">Clear</button><br>
+        <button class="blog" onclick="resetAll()">Reset Board</button>
+    </div>
+    <div id="Score" class="tabcontent">
+        <table class="tg">
+          <tr>
+            <th class="tg-fll5"></th>
+            <th class="tg-flq1"><img src="globe.png" alt="G" height="30px"><br>TR</th>
+            <th class="tg-htk3">Green<br>pts</th>
+            <th class="tg-flq2">City<br>pts</th>
+            <th class="tg-fll5">Milestone<br>pts</th>
+            <th class="tg-fll5">Award<br>pts</th>
+            <th class="tg-fll5">Card<br>pts</th>
+            <th class="tg-fll5">Total<br>pts</th>
+          </tr>
+          <tr id="splayer1">
+            <td class="tg-xldj" id="spn1">Player 1</td>
+            <td class="tg-flq1" id="sctr1">0</td>
+            <td class="tg-htk3" id="scgr1">0</td>
+            <td class="tg-flq2" id="scci1">0</td>
+            <td class="tg-quj4" id="scmi1">0</td>
+            <td class="tg-quj4"><input id="scaw1" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4"><input id="scca1" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4" id="scto1">0</td>
+          </tr>
+          <tr id="splayer2">
+            <td class="tg-xldj" id="spn2">Player 2</td>
+            <td class="tg-flq1" id="sctr2">0</td>
+            <td class="tg-htk3" id="scgr2">0</td>
+            <td class="tg-flq2" id="scci2">0</td>
+            <td class="tg-quj4" id="scmi2">0</td>
+            <td class="tg-quj4"><input id="scaw2" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4"><input id="scca2" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4" id="scto2">0</td>
+          </tr>
+          <tr id="splayer3">
+            <td class="tg-xldj" id="spn3">Player 3</td>
+            <td class="tg-flq1" id="sctr3">0</td>
+            <td class="tg-htk3" id="scgr3">0</td>
+            <td class="tg-flq2" id="scci3">0</td>
+            <td class="tg-quj4" id="scmi3">0</td>
+            <td class="tg-quj4"><input id="scaw3" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4"><input id="scca3" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4" id="scto3">0</td>
+          </tr>
+          <tr id="splayer4">
+            <td class="tg-xldj" id="spn4">Player 4</td>
+            <td class="tg-flq1" id="sctr4">0</td>
+            <td class="tg-htk3" id="scgr4">0</td>
+            <td class="tg-flq2" id="scci4">0</td>
+            <td class="tg-quj4" id="scmi4">0</td>
+            <td class="tg-quj4"><input id="scaw4" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4"><input id="scca4" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4" id="scto4">0</td>
+          </tr>
+          <tr id="splayer5">
+            <td class="tg-xldj" id="spn5">Player 5</td>
+            <td class="tg-flq1" id="sctr5">0</td>
+            <td class="tg-htk3" id="scgr5">0</td>
+            <td class="tg-flq2" id="scci5">0</td>
+            <td class="tg-quj4" id="scmi5">0</td>
+            <td class="tg-quj4"><input id="scaw5" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4"><input id="scca5" type="text" onfocusout="updateScores()" value="0" size="2"></td>
+            <td class="tg-quj4" id="scto5">0</td>
+          </tr>
+        </table>
+    </div>
+    <div id="Help" class="tabcontent">
+        <p>Tile placements will automatically raise correct GPs and give bonuses. For card bonus (and most messages), click message to dismiss.</p>
+        <p>For Awards and Milestones, click Player name first, then click Award/Milestone.</p>
+        <p>For Ocean tile bonus, place tile to dismiss message.</p>
+        <p>For Production phase, click Generation number.</p>
+        <p>Standard projects:<ul><li>Sell cards for &euro;</li>
+        <li>Energy Production - 11&euro;</li>
+        <li>Temp raise - 14&euro;</li>
+        <li>Place Ocean - 18&euro;</li>
+        <li>Place Greenery - 23&euro;</li>
+        <li>Place City + 1 &euro; Production - 25&euro;</li></ul></p>
+        <p>Click on the bot name to get it to play.</p>
+        <p>Bots can purchase production of anything for a base price plus their current production. Base price for Money/Steel/Titanium/Plants/Energy/Heat are 5/8/10/11/5/6</p>
+        <p>Bots can only use steel/titanium to help pay for cities. They MUST use more steel than titanium when using any titanium.</p>
+        <p>Bots immediately sell any cards they acquire (and without using an action).</p>
+        <p>If you can't figure out what a bot did, look in the log on the Setup tab.</p>
+        <p>The checkbox (near the thermometer icon) will get checked when the bot passes. Click the generation button to go to the next generation (or final greenery placements).</p>
+<!--
+        <p>Milestones:<ul><li>TR of 35 or more</li>
+        <li>Own 3 or more Cities</li>
+        <li>Own 3 or more Greeneries</li>
+        <li>Have 8 or more Building tags</li>
+        <li>have 16 or more cards in hand</li></ul></p>
+        <p>Awards:<ul><li>Landlord-most owned tiles</li>
+        <li>Banker-highest MC production</li>
+        <li>Scientist-most science tags</li>
+        <li>Thermalist-most heat cubes</li>
+        <li>Miner-most Steel+Titanium cubes</li></ul></p>
+-->
+    </div>
+    <div style="display:none">
+    <img src="plant.png" alt="P" id="plantimg">
+    <img src="steel.png" alt="S" id="steelimg">
+    <img src="titanium.png" alt="T" id="titaniumimg">
+    <img src="card.png" alt="[]" id="cardimg">
+    <img src="city.png" alt="C" id="cityimg">
+    <img src="doublewave.png" alt="WW" id="doublewaveimg">
+    <img src="energy.png" alt="E" id="energyimg">
+    <img src="factory.png" alt="F" id="factoryimg">
+    <img src="mars.png" alt="M" id="marsimg">
+    <img src="mohole.png" alt="H" id="moholeimg">
+    <img src="pawprints.png" alt="eco" id="pawprintsimg">
+    <img src="prohibit.png" alt="\" id="prohibitimg">
+    <img src="radioactive.png" alt="*" id="radioactiveimg">
+    <img src="volcano.png" alt="V" id="volcanoimg">
+    <img src="checker.png" alt="#" id="checkerimg">
+    </div>
+</div>
+<script type="text/javascript" src="automatm.js">
+</script>
+<script type="text/javascript" src="tm.js">
+</script>
+<script>
+setTimeout(startGame, 500);
+</script>
+
+
+
+</body>
+</html>

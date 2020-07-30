@@ -1,0 +1,367 @@
+<!doctype html>
+
+<html>
+<head>
+	<title>Setup for Crypto-forming Mars</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="shortcut icon"
+ href="http://sliceofbread.neocities.org/tm/mars.ico">
+<!--
+ Copyright 2020 SliceOfBread
+-->
+<style>
+* {box-sizing: border-box}
+
+body {
+  font-family: "Arial", sans-serif;font-size:28px;
+}
+
+input {
+  padding: 0px;
+  font-family:Arial, sans-serif;font-size:24px;
+  margin: 0;}
+  
+select {
+  font-family:Arial, sans-serif;font-size:28px;
+}
+
+.prelude {display:none}
+.colonies {display:none}
+.venus {display:none}
+.turmoil {display:none}
+.promo {display:none}
+
+div {margin: 2px;border-style: solid;border-color: black;border-width:2px}
+
+.bigbutt {padding:10px 20px;font-size:30px;border-width:2px}
+.bigfont {font-size:30px}
+</style>
+</head>
+<body>
+    <div>
+        <select id="numplayers" onchange="changePlayers()">
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4">4 Players</option>
+            <option value="5">5 Players</option>
+        </select>
+        <input id="name1" placeholder="Player Name" onchange="changePlayers()">
+        <input id="name2" placeholder="Player Name" onchange="changePlayers()">
+        <input id="name3" placeholder="Player Name" onchange="changePlayers()" style="display:none">
+        <input id="name4" placeholder="Player Name" onchange="changePlayers()" style="display:none">
+        <input id="name5" placeholder="Player Name" onchange="changePlayers()" style="display:none">
+    </div>
+    <div>
+        Select Expansions<br>
+        <input type="checkbox" id="cbprelude" name="cbprelude" onchange="toggle('cbprelude')"><label for="cbprelude">Prelude</label><br>
+        <input type="checkbox" id="cbvenus" name="cbvenus" onchange="toggle('cbvenus')"><label for="cbvenus">Venus Next</label><br>
+        <input type="checkbox" id="cbcolonies" name="cbcolonies" onchange="toggle('cbcolonies')"><label for="cbcolonies">Colonies</label><br>
+        <input type="checkbox" id="cbpromo" name="cbpromo" onchange="toggle('cbpromo')"><label for="cbpromo">Promos</label><br>
+        <input type="checkbox" id="cbturmoil" name="cbturmoil" onchange="toggle('cbturmoil')"><label for="cbturmoil">Turmoil</label><br>
+    </div>
+    <div>
+        <input type="checkbox" id="cbdrawuntil" name="cbdrawuntil" onchange="toggle('cbdrawuntil')" checked><label for="cbdrawuntil">Exclude &quot;Draw Until&quot; Cards</label><br>
+    </div>
+    <div style="background-color:#ffb566">
+        <label for="corpsperplayer">Corporations per player</label><input type="number" id="corpsperplayer" name="corpsperplayer" size="2" value="2" onchange="genSetup()"><br>
+        <label for="excludecorp">Exclude:</label><input id="excludecorp" name=="excludecorp" onchange="genSetup()"><br> 
+        <select id="selectcorp" onchange="genSetup()" multiple>
+        </select>
+    </div>
+    <div>
+        <label for="projsperplayer">Starting projects per player</label><input type="number" id="projsperplayer" name="projsperplayer" value="10" size="2" onchange="genSetup()"><br>
+        <label for="excludeproj">Exclude:</label><input id="excludeproj" name=="excludeproj" onchange="genSetup()"><br> 
+        <select id="selectproj" onchange="genSetup()" multiple>
+        </select>
+    </div>
+    <div id="preludeoption" style="display:none;background-color:#ff9999">
+        <label for="prelsperplayer">Preludes per player</label><input type="number" id="prelsperplayer" name="prelsperplayer" value="4" size="2" onchange="genSetup()"><br>
+        <label for="excludeprel">Exclude:</label><input id="excludeprel" name=="excludeprel" onchange="genSetup()"><br>
+        <select id="selectprel" onchange="genSetup()" multiple>
+        </select>
+    </div>
+    <div id="colonyoption" style="display:none;background-color:#ffe6cc">
+        <label for="numcolonies">Number of Colonies</label><input type="number" id="numcolonies" name="numcolonies" value="5" size="2" onchange="genSetup()"><br>
+        <label for="excludecol">Exclude:</label><input id="excludecol" name=="excludecol" onchange="genSetup()"><br>
+        <select id="selectcol" onchange="genSetup()" multiple>
+        </select>
+    </div>
+    <div id="turmoiloption" style="display:none;background-color:#999900">
+        <label for="excludeglbl">Exclude:</label><input id="excludeglbl" name=="excludeglbl" onchange="genSetup()"><br>
+        <select id="selectglbl" onchange="genSetup()" multiple>
+        </select>
+    </div>
+    <textarea id="copyPasteBox" rows="10" cols="80" style="display:block"></textarea>
+    <button class="bigbutt" onclick="copyToClipboard()">Copy to Clipboard</button><br>
+<script src="cards.js"></script>
+<script>
+
+var game = {};
+
+var masterColList = [];
+//var newGenObjTemplate = '{"newGen":{"name":"","proj":0}}';
+
+const deckType = ["corp", "prel", "proj", "col", "glbl"];
+
+var numPlayers = 2;
+
+function changePlayers() {
+    numPlayers = Number(document.getElementById("numplayers").value);
+    for (var p=3; p<6; p++) {
+        if (numPlayers < p) {
+            document.getElementById("name" + p).style.display = "none";
+        } else {
+            document.getElementById("name" + p).style.display = "inline";
+        }
+    }            
+    document.getElementById("numcolonies").value = numPlayers + 2;
+    if (numPlayers == 2) {
+        document.getElementById("numcolonies").value = 5;
+    }
+    genSetup();
+}
+
+function toggle(box) {
+    var ch = false;
+    if (document.getElementById(box).checked) {
+        ch=true;
+    }
+    switch (box) {
+        case "cbprelude":
+            if (ch) {
+                document.getElementById("preludeoption").style.display = "block";
+            } else {
+                document.getElementById("preludeoption").style.display = "none";
+            }
+            break;
+        case "cbcolonies":
+            if (ch) {
+                document.getElementById("colonyoption").style.display = "block";
+            } else {
+                document.getElementById("colonyoption").style.display = "none";
+            }
+            break;
+        case "cbturmoil":
+            if (ch) {
+                document.getElementById("turmoiloption").style.display = "block";
+            } else {
+                document.getElementById("turmoiloption").style.display = "none";
+            }
+            break;
+        case "cbdrawuntil":
+        case "cbpromo":
+        case "cbvenus":
+            break;
+    }
+        
+    genSetup();
+}
+
+function setClassDisplay(c, d) {
+    var tmpList = document.getElementsByClassName(c);
+    for (var i=0; i<tmpList.length; i++) {
+        tmpList[i].style.display = d;
+    }
+}
+
+function setClassSelect(c, s) {
+    var tmpList = document.getElementsByClassName(c);
+    for (var i=0; i<tmpList.length; i++) {
+        tmpList[i].selected = s;
+    }
+}
+
+var game = {};
+var pn = {};
+
+function genSetup() {
+    game.options = {};
+    pn.playerNames = [];
+    
+    numPlayers = Number(document.getElementById("numplayers").value);
+    for (var p=1; p<=numPlayers; p++) {
+        pn.playerNames[p-1] = document.getElementById("name" + p).value;
+    }
+    game.options.expansions = [];
+    if (document.getElementById("cbvenus").checked) {
+        game.options.expansions.push("venus");
+        // set all venus cards to visible
+        setClassDisplay("venus", "block");
+    } else {
+        // set all venus cards to invisible
+        setClassDisplay("venus", "none");
+    }
+    game.options.corpsPerPlayer = document.getElementById("corpsperplayer").value;
+    game.options.projsPerPlayer = document.getElementById("projsperplayer").value;
+    if (document.getElementById("cbprelude").checked) {
+        game.options.prelsPerPlayer = document.getElementById("prelsperplayer").value;
+        game.options.expansions.push("prelude");
+        setClassDisplay("prelude", "block");
+    } else {
+        game.options.prelsPerPlayer = 0;
+        setClassDisplay("prelude", "none");
+    }
+    if (document.getElementById("cbcolonies").checked) {
+        game.options.numColonies = document.getElementById("numcolonies").value;
+        game.options.expansions.push("colonies");
+        setClassDisplay("colonies", "block");
+    } else {
+        game.options.numColonies = 0;
+        setClassDisplay("colonies", "none");
+    }
+    if (document.getElementById("cbturmoil").checked) {
+        game.options.expansions.push("turmoil");
+        setClassDisplay("turmoil", "block");
+    } else {
+        setClassDisplay("turmoil", "none");
+    }
+    if (document.getElementById("cbpromo").checked) {
+        game.options.expansions.push("promos");
+        setClassDisplay("promo", "block");
+    } else {
+        setClassDisplay("promo", "none");
+    }
+    if (document.getElementById("cbdrawuntil").checked) {
+        setClassSelect("drawuntil", true);
+    } else {
+        setClassSelect("drawuntil", false);
+    }
+    game.options.exclude = {};
+    for (var dt=0; dt < deckType.length; dt++) {
+        thisDt = deckType[dt];
+        if ((thisDt == "prel") && !document.getElementById("cbprelude").checked) continue;
+        if ((thisDt == "col") && !document.getElementById("cbcolonies").checked) continue;
+        var thisSel = document.getElementById("select" + thisDt);
+        document.getElementById("exclude" + thisDt).value = "";
+        for (var c=0; c < thisSel.childNodes.length; c++) {
+            if (thisSel.childNodes[c].selected) {
+                document.getElementById("exclude" + thisDt).value += "" + thisSel.childNodes[c].innerHTML.substr(0,3) + " ";
+            }
+        }
+        game.options.exclude[thisDt] = document.getElementById("exclude" + thisDt).value.trim();
+    }
+    
+    textBoxClear("copyPasteBox");
+    textBoxAppend("copyPasteBox", ":::" + JSON.stringify(pn) + ":::");
+    textBoxAppend("copyPasteBox", ":::" + JSON.stringify(game) + ":::");
+    textBoxAppend("copyPasteBox", ':::"primerolls"replace with 2 1d1000000 rolls:::');
+    
+    
+}
+
+function textBoxClear(boxname) {
+    document.getElementById(boxname).innerHTML = "";
+}
+
+function textBoxAppend(boxname, i) {
+        document.getElementById(boxname).innerHTML += i + "\n";
+        document.getElementById(boxname).scrollTop = document.getElementById(boxname).scrollHeight;
+}
+
+function clickCardLink(grp) {
+    var baseURL = "https://ssimeonoff.github.io/cards-list";
+    var fromObj = document.getElementById(grp);
+    var tmpFlag = false;
+    for (var c=0; c < fromObj.childNodes.length; c++) {
+        var tmp = fromObj.childNodes[c].innerHTML;
+        var colonPos = tmp.indexOf(":");
+        if (colonPos < 0) continue;
+        var tmpC = tmp.substring(0,colonPos);
+        tmpC = tmpC.replace(/^Z/,"CORP");
+        baseURL += "#" + tmpC;
+        tmpFlag = true;
+    }
+    if (tmpFlag) window.open(baseURL);
+}
+
+function initSelectLists() {
+    for (var dt=0; dt < deckType.length; dt++) {
+        thisDt = deckType[dt];
+        document.getElementById("select" + thisDt).innerHTML = "";
+        for (var cnum=0; cnum < cards[thisDt].length; cnum++) {
+            var toAdd = document.createElement("option");
+            toAdd.value = cnum;
+            // add class to determine expansion
+            var firstChar = cards[thisDt][cnum].cardNum.substr(0,1);
+            if (isNaN(firstChar)) {
+                // card starts with a letter
+                switch (firstChar) {
+                    case 'P':
+                        toAdd.className = "prelude";
+                        break;
+                    case 'C':
+                        toAdd.className = "colonies";
+                        break;
+                    case 'X':
+                        toAdd.className = "promo";
+                        break;
+                    case 'T':
+                        toAdd.className = "turmoil";
+                        break;
+                    case 'Z':
+                        var pnum = Number(cards[thisDt][cnum].cardNum.substr(1));
+                        if ((pnum > 12) && (pnum < 18)) {
+                            toAdd.className = "venus";
+                        } else if ((pnum > 17) && (pnum < 23)) {
+                            toAdd.className = "prelude";
+                        } else if ((pnum > 22) && (pnum < 28)) {
+                            toAdd.className = "colonies";
+                        } else if ((pnum > 27) && (pnum < 33)) {
+                            toAdd.className = "turmoil";
+                        } else if ((pnum > 32) && (pnum < 39)) {
+                            toAdd.className = "promo";
+                        }
+                        break;
+                }
+            } else {
+                // must be a project check if in venus range
+                var pnum = Number(cards[thisDt][cnum].cardNum);
+                if ((pnum > 212) && (pnum < 262)) {
+                    toAdd.className = "venus";
+                } else if ((pnum > 208) && (pnum < 213)) {
+                    toAdd.className = "promo";
+                }
+            }
+            // add class for 'draw until' cards
+            switch (cards[thisDt][cnum].cardNum) {
+                case "Z14":
+                case "Z16":
+                case "Z38":
+                case "P12":
+                case "P35":
+                    toAdd.className += " drawuntil";
+                    break;
+                default:
+                    break;
+            }
+            // convert number to card name
+            toAdd.innerHTML = cards[thisDt][cnum].cardNum + ":" + cards[thisDt][cnum].cardName;
+            document.getElementById("select" + thisDt).appendChild(toAdd);
+        }
+    }
+}
+
+function copyToClipboard() {
+    // Note: this code from https://www.w3schools.com/howto/howto_js_copy_clipboard.asp
+  var copyText = document.getElementById("copyPasteBox");
+
+  /* Select the text field */
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+  /* Copy the text inside the text field */
+  document.execCommand("cut");
+}
+
+
+    textBoxClear("copyPasteBox");
+    initSelectLists();
+
+
+</script>
+
+
+
+</body>
+</html>

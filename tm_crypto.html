@@ -1,0 +1,1753 @@
+<!doctype html>
+
+<html>
+<head>
+	<title>Crypto-forming Mars</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="shortcut icon"
+ href="http://sliceofbread.neocities.org/tm/mars.ico">
+<!--
+ Copyright 2019 SliceOfBread
+-->
+<style>
+* {box-sizing: border-box}
+
+body {
+  font-family: "Arial", sans-serif;font-size:28px;
+}
+
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+    
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+  
+th, td {
+  padding: 5px;
+}
+
+select {
+  padding: 5px;
+}
+
+#firstelement {
+    width:900px;
+}
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  float: left;
+  display: none;
+  padding: 2px 2px;
+  border: 1px solid #ccc;
+  border-left: none;
+  
+}
+
+input {
+  padding: 0px;
+  font-family:Arial, sans-serif;font-size:24px;
+  margin: 0;}
+  
+select {
+  font-family:Arial, sans-serif;font-size:28px;
+}
+  
+.c_heat{background-color:#cb0000;color:#fcff2f;padding:5px;}
+
+img{vertical-align: text-bottom;}
+
+.bigbutt {padding:10px 20px;font-size:30px;border-width:2px}
+.bigfont {font-size:30px}
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;padding:0px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-weight:bold;padding:5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;text-align:center;}
+.tg .tg-cly1{text-align:center;vertical-align:middle}
+.tg .tg-ft9w{background-color:#80ff80;vertical-align:middle}
+.tg .tg-k12w{background-color:#ffd480;vertical-align:middle}
+.tg .tg-baly{background-color:#fd6864;vertical-align:middle}
+.tg-play{background-color:#66ffff;vertical-align:middle}
+.tg-corp{background-color:#ff9933;padding:5px;vertical-align:middle}
+.tg-prel{background-color:#ff9999;padding:5px;vertical-align:middle}
+.tg .tg-col{background-color:#ffe6cc;padding:5px;vertical-align:middle}
+</style>
+</head>
+<body>
+    <select id="gamelist" onchange="gameListChange()">
+        <option value="select">Select...</option>
+        <option value="new">New game</option>
+        <option value="restart">Restart on new device</option>
+    </select>
+    <input id="threadnum" type="number" placeholder="BGG thread number" min="1000000" max="9999999">
+    <input id="secretseed" type="text" placeholder="Secret seed" size="8" maxlength="8" style="display:none">
+    <button class="bigbutt" onclick="goClick()">Go!</button>
+    <div id="setuplink" style="display:none"><a href="tm_crypto_setup.html" target="_blank">Game setup link</a></div>
+    <h3 id="threadname"></h3>
+    <button id="rebuildbutt" class="bigbutt" onclick="clickRebuild()" style="color:white;background-color:indigo;display:none">Rebuild game</button>
+    <button id="deletebutt" class="bigbutt" onclick="clickDelete()" style="color:white;background-color:red;display:none">Delete game</button><br>
+    <textarea id="boxLog" rows="10" cols="80"></textarea><br>
+    <div id="myname" class="bigfont" style="display:none">My name is:<select id="selectMe" style="display:inline" onchange="nameChange()">
+    </select><button class="bigbutt" onclick="clickNameSelected()">Name selected!</button></div>
+    <div id="requests"><button class="bigbutt" onclick="clickRequestCards()">Request</button>
+    <select id="reqnum">
+        <option value="4">4 project cards</option>
+        <option value="3">3 project cards</option>
+        <option value="2">2 project cards</option>
+        <option value="1">1 project card</option>
+        <option value="64">Research, 4 proj/player</option>
+        <option class="glblblock" value="16">1 Global Event card</option>
+        <option class="prellblock" value="8">1 PRELUDE card</option>
+        <option value="32">REVEAL 1 project card</option>
+    </select></div>
+    <textarea id="copyPasteBox" rows="10" cols="80" style="display:block"></textarea>
+    <button class="bigbutt" onclick="copyToClipboard()">Copy to Clipboard</button>
+    <input type="checkbox" id="openbgg" checked><span style="font-size:14px">Also open new BGG tab</span><br>
+    <table class="tg">
+        <tr>
+            <th class="tg-corp"><button class="bigbutt tg-corp" onclick="clickCardLink('mycorp')">Corporation</button></th>
+            <th class="tg-prel dispprel"><button class="bigbutt tg-prel" onclick="clickCardLink('mypreludes')">Prelude</button></th>
+            <th class="tg-col dispcol"><button class="bigbutt tg-col" onclick="clickCardLink('colonies')">Colonies</button></th>
+        </tr>
+        <tr>
+            <td class="tg-corp"><select id="mycorp" class="tg-corp"></select></td>
+            <td class="tg-prel dispprel"><select id="mypreludes" class="tg-prel" size="1" multiple></select></td>
+            <td class="tg-col dispcol"><select id="colonies" class="tg-col" size="1" multiple></select></td>
+        </tr>
+    </table>
+    <table class="tg dispglbl">
+        <tr style="color:white;background-color:#993300;">
+            <th colspan="2">Global Events</th>
+        </tr>
+        <tr style="background-color:#ff6600;">
+            <td onclick="clickEvent('current')">Current</td>
+            <td onclick="clickEvent('current')" id="currentGE"></td>
+        </tr>
+        <tr style="background-color:#e6e6e6;">
+            <td onclick="clickEvent('coming')">Coming</td>
+            <td onclick="clickEvent('coming')" id="comingGE"></td>
+        </tr>
+        <tr style="background-color:#99ccff;">
+            <td onclick="clickEvent('distant')">Distant</td>
+            <td onclick="clickEvent('distant')" id="distantGE"></td>
+        </tr>
+    </table>
+    <table class="tg">
+      <tr>
+        <th class="tg-ft9w"><button class="bigbutt tg-ft9w" onclick="clickCardLink('hand')">In Hand</button></th>
+        <td class="tg-cly1" rowspan="3">
+            <button class="bigbutt" onclick="clickDealt2Hand()" style="display:inline;background-color:#80ff80;">&larr;</button></td>
+        <th class="tg-k12w"><button class="bigbutt tg-k12w" onclick="clickCardLink('dealt')">Dealt</button></th>
+      </tr>
+      <tr>
+        <td class="tg-ft9w" rowspan="3"><select id="hand" style="display:block;background-color:#80ff80;" size="8" multiple></select></td>
+        <td class="tg-k12w"><select id="dealt"  style="display:block;background-color:#ffd480;"multiple></select></td>
+      </tr>
+      <tr>
+        <td class="tg-cly1"><button class="bigbutt" onclick="clickDealt2Discard()" style="display:inline;background-color:#fd6864;">&dArr;</button></td>
+      </tr>
+      <tr>
+        <td class="tg-cly1">
+            <button class="bigbutt" onclick="clickHand2Discard()" style="display:block;background-color:#fd6864;">&rArr;</button></td>
+        <th class="tg-baly"><button class="bigbutt tg-baly" onclick="clickCardLink('discard')">Discarded</th>
+      </tr>
+      <tr>
+        <td class="tg-cly1" colspan="2"><button class="bigbutt" onclick="clickHand2Played()" style="display:inline;background-color:#66ffff;">&darr;</button></td>
+        <td class="tg-baly" rowspan="3"><select id="discard" style="display:block;background-color:#fd6864;" size="7" multiple></select></td>
+      </tr>
+      <tr>
+        <th class="tg-play" colspan="2"><button class="bigbutt tg-play" onclick="clickCardLink('played')">Played</th>
+      </tr>
+      <tr>
+        <td class="tg-play" colspan="2"><select id="played" style="display:block;background-color:#66ffff;" multiple></select></td>
+      </tr>
+    </table>
+    <table class="tg">
+    <tr>
+        <td id="otherplayers"></td>
+    </tr>
+    </table>
+    <div></div>
+    <button class="bigbutt" onclick="test()" style="display:none">test</button><br>
+    <textarea id="testLog" rows="10" cols="80" style="display:none"></textarea><br>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js">
+</script>
+<script src="https://peterolson.github.io/BigInteger.js/BigInteger.min.js"></script>
+<script src="cards.js"></script>
+<script src="tm_crypto.js"></script>
+<script>
+//startGame();
+var game = {};
+var pairNum;
+var primeBitLength = 128;
+var bigIntPrime;
+var enc = [];
+var dec = [];
+var threadNum = "select";
+var appMode = "new"; // or "update" or "restart"
+var currPos = {"proj":0, "prel":0, "glbl":0};
+var lastArticle = "";
+
+const mask = {
+    "proj" : 1 << 12,
+    "corp" : 1 << 13,
+    "prel" : 1 << 14,
+    "col" : 1 << 15,
+    "glbl" : 1 << 16};
+
+var masterList = {};
+var reshuffleDeck = [];
+var playedCards = {};
+var shuffleStr = "";
+var reshuffleStr = "";
+var needReshuffle = false;
+var rebuild = false;
+var lastNotFinalized = {};
+var decObjTemplate = '{"decrypt":{"name":"","corp":{},"prel":{},"proj":{},"glbl":{}}}';
+var updateObjTemplate = '{"update":{"name":"","hand":{"corp":[],"prel":[],"proj":[]},"discard":{"corp":[],"prel":[],"proj":[]},"played":{"corp":[],"prel":[],"proj":[]}}}';
+var reqProjObjTemplate = '{"request":{"name":""}}';
+//var newGenObjTemplate = '{"newGen":{"name":"","proj":0}}';
+
+const locs = ["dealt", "hand", "discard", "played"];
+const allLocs = ["dealt", "hand", "discard", "played", "mycorp", "mypreludes", "colonies"];
+const deckType = ["corp", "prel", "proj", "glbl"];
+
+
+function initAll() {
+    masterList = {
+        "corp": [],
+        "prel":[],
+        "proj":[],
+        "col":[],
+        "glbl":[]};
+    reshuffleDeck = [];
+    game = {
+        state:"none",
+        myName:"",
+        numPlayers:1,
+        playerNames:[],
+        playerOrder:[],
+        colonies:[],
+        options:{},
+        mySeed:"",
+        threadName:"",
+        prime:5,
+        deck:{corp:[],
+            proj:[],
+            glbl:[],
+            prel:[]},
+        cryptState:{corp:[],
+            proj:[],
+            glbl:[],
+            prel:[]},
+        postState:{corp:[],
+            proj:[],
+            glbl:[],
+            prel:[]},
+        baseEnc: [],
+        baseDec: [],
+        projEnc: [],
+        projDec: [],
+        corpEnc: [],
+        corpDec: [],
+        glblEnc: [],
+        glblDec: [],
+        prelEnc: [],
+        prelDec: []};
+    
+    game.options.corpsPerPlayer = 2;
+    game.options.prelsPerPlayer = 0;
+    game.options.projsPerPlayer = 10;
+    
+}
+
+function gameListChange() {
+    var tList = document.getElementsByTagName("table");
+    for (var t=0; t < tList.length; t++) {
+        tList[t].style.display = "none";
+    }
+    var tn = document.getElementById("gamelist").value;
+    // if regenerating, show box for mySeed
+    if (document.getElementById("gamelist").value == "restart") {
+        document.getElementById("secretseed").style.display = "inline-block";
+    } else {
+        document.getElementById("secretseed").style.display = "none";
+    }
+    if (document.getElementById("gamelist").value == "new") {
+        document.getElementById("setuplink").style.display = "block";
+    } else {
+        document.getElementById("setuplink").style.display = "none";
+    }
+    if (!isNaN(tn)) {
+        // threadnum
+        document.getElementById("deletebutt").style.display = "inline-block";
+        document.getElementById("rebuildbutt").style.display = "inline-block";
+        game = JSON.parse(localStorage.getItem("thread" + tn));
+        document.getElementById("threadname").innerHTML = game.threadName;
+        //document.getElementById("threadnum").value = tn;
+        textBoxClear("boxLog");
+        textBoxAppend("boxLog", `Secret seed for thread #${tn} is ${game.mySeed}`, true);
+        if (game.playerOrder.length) {
+            textBoxAppend("boxLog", `player order = ${playersOrderString()}`);
+        }
+        document.getElementById("threadnum").style.display = "none";
+    } else {
+        document.getElementById("deletebutt").style.display = "none";
+        document.getElementById("rebuildbutt").style.display = "none";
+        document.getElementById("threadnum").style.display = "inline-block";
+        document.getElementById("threadname").innerHTML = "";
+    }
+}
+
+function nameChange() {
+    game.myName = document.getElementById("selectMe").value;
+    if (!isNaN(threadNum)) {
+        localStorage.setItem("thread" + threadNum, JSON.stringify(game));
+    }
+}
+
+function goClick() {
+    const abc = "qwertyuiopasdfghjklzxcvbnm";
+    var gameSelect = document.getElementById("gamelist").value;
+    var tn = document.getElementById("threadnum").value;
+    if (gameSelect === "select") {
+        // do nothing
+    } else if (gameSelect === "new") {
+        initAll();
+        if (lclThreads.includes(tn)) {
+            window.alert("Thread " + tn + " already saved locally.");
+            return;
+        }
+        threadNum = Number(tn);
+        game.state = "init";
+        appMode = "new";
+        textBoxClear("boxLog");
+        // gen seed
+        var newseed = "";
+        for (var i=0; i<8; i++) {
+            newseed += abc.charAt(Math.floor(myRand() * abc.length));
+        }
+        textBoxAppend("boxLog", "You will need following seed if you switch computers or browsers");
+        textBoxAppend("boxLog", "You may want to send to yourself in an email");
+        textBoxAppend("boxLog", "Keep it secret!");
+        textBoxAppend("boxLog", `new seed:${newseed}`);
+        game.mySeed = newseed;
+        
+        // add thread to saved lists
+        //lclThreads.push(tn);
+        //localStorage.cryptoThreads = JSON.stringify(lclThreads);
+        //addGameToList(tn);
+        //localStorage.setItem("thread" + tn, JSON.stringify(game));
+        
+        textBoxAppend("boxLog", "Fetching data from BGG...");
+        // load data from BGG to get: primeRolls, playerNames
+            
+        loadDoc(tn, 1, 0);
+        
+        // Note: processing continues in loadDoc
+        
+    } else if (gameSelect === "restart") {
+        // this is for games started on one browser/computer and continuing on another
+        // user needs to enter both thread # and secret seed
+        if (document.getElementById("secretseed").value.length < 8) {
+            window.alert("You must enter 8 character secret seed");
+            return;
+        }
+        if (lclThreads.includes(tn)) {
+            window.alert("Thread " + tn + " already saved locally.");
+            return;
+        }
+        appMode = "restart";
+        threadNum = Number(tn);
+        game.mySeed = document.getElementById("secretseed").value;
+        game.state = "init";
+        // add thread to saved lists
+        //lclThreads.push(tn);
+        //localStorage.cryptoThreads = JSON.stringify(lclThreads);
+        //addGameToList(tn);
+        //localStorage.setItem("thread" + tn, JSON.stringify(game));
+        // load data from BGG to get: primeRolls, playerNames
+        loadDoc(tn, 1, 0);
+    } else {
+        threadNum = Number(document.getElementById("gamelist").value);
+        game = JSON.parse(localStorage.getItem("thread" + gameSelect));
+        appMode = "update";
+        for (var l of allLocs) {
+            document.getElementById(l).innerHTML = "";
+        }
+        textBoxClear("copyPasteBox");
+        // loadDoc and process based on game.state
+        // Note: it is possible game was started on one device, continued on another
+        // and then continued again on first device which must update itself
+        loadDoc(gameSelect, 0, 0);
+    }
+        
+}
+
+function processBggInit(d) {
+    if (d.indexOf("primerolls")==1) {
+        var r = [];
+        r = d.match(/>\d+</g);
+        var pr = "";
+        for (var i=0; i<r.length; i++) {
+            r[i] = r[i].slice(1, r[i].length - 1);
+            while (r[i].length < 6) {
+                r[i] = "0" + r[i];
+            }
+            pr = pr + r[i];
+        }
+        game.primeRolls = pr;
+        textBoxAppend("boxLog", `primeRolls=${game.primeRolls}`);
+    } else if (d.indexOf("playerNames")==2) {
+        var names = JSON.parse(d);
+        game.playerNames = names.playerNames;
+        game.numPlayers = game.playerNames.length;
+        textBoxAppend("boxLog", `playerNames=${game.playerNames}`);
+        document.getElementById("selectMe").innerHTML = "";
+        for (var n of game.playerNames) {
+            var toAdd = document.createElement("option");
+            toAdd.value = n;
+            toAdd.innerHTML = n;
+            document.getElementById("selectMe").appendChild(toAdd);
+        }
+    } else if (d.indexOf("options")==2) {
+        var o = JSON.parse(d);
+        game.options = o.options;
+    }
+    textBoxAppend("boxLog", "");
+}
+
+function processBggDecks(d) {
+    // look for shuffled decks
+    if ((d.indexOf("decks") > 0) && (d.indexOf("decks") < 4)) {
+        shuffleStr = d;
+    }    
+}
+
+function processBggPlay(d) {
+    if ((d.indexOf("decrypt") > 0) && (d.indexOf("decrypt") < 4)) {
+        processDecrypt(d);
+    } else if ((d.indexOf("update") > 0) && (d.indexOf("update") < 4)) {
+        // check if our update and if so update cryptState
+        if (game.state != "play") return(0);
+        processUpdate(d);
+    } else if ((d.indexOf("request") > 0) && (d.indexOf("request") < 4)) {
+        if (game.state != "play") return(0);
+        processRequest(d, "request");
+    } else if ((d.indexOf("reveal") > 0) && (d.indexOf("reveal") < 4)) {
+        if (game.state != "play") return(0);
+        processRequest(d, "reveal");
+    }
+    return(1);
+}
+        
+function processDecrypt(d) {
+    var o = JSON.parse(d);
+    // got some decrypt codes
+    if (o.decrypt.name == game.myName) {
+        // if ours, mark that we know they were posted
+        for (var dt of deckType) {
+            if (o.decrypt.hasOwnProperty(dt)) {
+                for (var k in o.decrypt[dt]) {
+                    var knum = Number(k);
+                    if (game.postState[dt][knum] & 1) {
+                        game.postState[dt][knum] &= 0xfc;
+                        game.postState[dt][knum] |= 2;
+                    } 
+                }
+            }
+        }
+        
+        return; 
+    }
+    // codes from other players
+    var thisPl = game.playerNames.indexOf(o.decrypt.name);
+    if (thisPl < 0) {
+        window.alert(`Unknown player name in decrypt: ${o.decrypt.name}`);
+        return;
+    }
+    // check if we need them
+    for (var dt of deckType) {
+        if (o.decrypt.hasOwnProperty(dt)) {
+            for (var k in o.decrypt[dt]) {
+                // is corp/prel/proj[k] already decoded by this player?
+                // k / knum is the position in corresponding deck being decoded
+                var knum = Number(k);
+                if ((game.cryptState[dt][knum] & (1 << thisPl)) != 0) {
+                    // already decoded, skip it
+                    continue;
+                }
+                // Use string to decode 
+                game.deck[dt][knum] = decrypt(game.deck[dt][knum], o.decrypt[dt][k]);
+                // mark that it was decoded with this player's string
+                game.cryptState[dt][knum] |= (1 << thisPl);
+                if ((game.cryptState[dt][knum] & 0x1f) == ((1 << game.numPlayers) - 1)) {
+                    // finished decoding
+                    logDecrypt(game.deck[dt][knum],knum, o.decrypt.name);
+                }
+            }
+        }
+    }
+}
+        
+function processRequest(d, rtype) {
+    // mark any non-posted request as "to be posted"
+    // update deck atrray pointers
+    var o = JSON.parse(d);    
+    for (var j=1; j<deckType.length; j++) {// only process prel and proj and glbl
+        var thisType = deckType[j];
+        // process prel/proj/glbl
+        if (o[rtype].hasOwnProperty(thisType)) {
+            if (thisType == "glbl") {
+                // global events get treated differently, mark this glbl needs posting
+                game.postState[thisType][o[rtype][thisType]] = 1;
+            } else {
+                // check for overflow, need reshuffle
+                if (currPos[thisType] + o[rtype][thisType] > game.postState[thisType].length) {
+                    // this request is for more than we can handle
+                    if (thisType != "proj") {
+                        window.alert(`Error! Request for ${thisType} exceeds limits!`);
+                        continue;
+                    }
+                    // proj request past end of deck means we need to reshuffle
+                    textBoxAppend("boxLog", "Project discards need to be reshuffled");
+                    needReshuffle = true;
+                } else {
+                    if ((o[rtype].name != game.myName) || (rtype == "reveal")) {
+                        // if request was not from us, mark cards needing decrypt
+                        for (var x=0; x < o[rtype][thisType]; x++) {
+    
+                            if (game.postState[thisType][currPos[thisType] + x] == 0) {
+                                // mark for posting (1) 
+                                game.postState[thisType][currPos[thisType] + x] = 1;
+                                if (rtype == "reveal") {
+                                    game.postState[thisType][currPos[thisType] + x] = 9;
+                                }
+                            }
+                        }
+                    }
+                    // whether request was for us or not, move array pointer
+                    currPos[thisType] += o[rtype][thisType];
+                }
+            }
+        }
+    }
+}
+
+function playerPosNum(name) {
+    return(game.playerNames.indexOf(name));
+}
+        
+function processUpdate(d) {
+    var o = JSON.parse(d);
+    // got some updates
+    // process the ones that were ours
+    if (o.update.name == game.myName) {
+        // update status of cards that have been posted
+        // process hand/discard/played
+        for (var i=1; i<locs.length; i++) {
+            var thisloc = locs[i];
+            if (o.update.hasOwnProperty(thisloc)) {
+                // process corp/prel/proj
+                for (var j=0; j<deckType.length; j++) {
+                    var thisType = deckType[j];
+                    if (o.update[thisloc].hasOwnProperty(thisType)) {
+                        for (var x of o.update[thisloc][thisType]) {
+                            game.cryptState[thisType][x] &= 0xff;
+                            game.cryptState[thisType][x] |= (0x100 << i);
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        // keep list of all played cards by other players
+        if (o.update.hasOwnProperty("played")) {
+            // process corp/prel/proj
+            for (var j=0; j<deckType.length; j++) {
+                var thisType = deckType[j];
+                if (o.update.played.hasOwnProperty(thisType)) {
+                    for (var x of o.update.played[thisType]) {
+                        playedCards[o.update.name][thisType].push(x);
+                    }
+                }
+            }
+        }
+    }
+}
+
+function processCardStates() {
+    // update corporation selected, if any
+    if (!game.cryptState.hasOwnProperty("corp")) return;
+    for (var c=0; c < game.cryptState["corp"].length; c++) {
+        for (var i=0; i<locs.length; i++) {
+            thisloc = locs[i];
+            if ((0x100 << i) & game.cryptState["corp"][c]) {
+                var tmpIndex = parseInt(game.deck["corp"][c], 16) & 0xfff;
+                var toAdd = document.createElement("option");
+                toAdd.value = game.deck["corp"][c];
+                toAdd.classList.add("tg-corp");
+                // convert number to card name
+                toAdd.innerHTML = cards["corp"][tmpIndex].cardNum + ":" + cards["corp"][tmpIndex].cardName;
+                if (thisloc == "played") {
+                    document.getElementById("mycorp").appendChild(toAdd);
+                } else {
+                    document.getElementById(thisloc).appendChild(toAdd);
+                }
+            }
+        }
+    }
+    // update preludes selected, if any
+    var tmpPrel = "";
+    for (var p=0; p < game.cryptState["prel"].length; p++) {
+        for (var i=0; i<locs.length; i++) {
+            thisloc = locs[i];
+            if ((0x100 << i) & game.cryptState["prel"][p]) {
+                var tmpIndex = parseInt(game.deck["prel"][p], 16) & 0xfff;
+                var toAdd = document.createElement("option");
+                toAdd.value = game.deck["prel"][p];
+                toAdd.classList.add("tg-prel");
+                // convert number to card name
+                toAdd.innerHTML = cards["prel"][tmpIndex].cardNum + ":" + cards["prel"][tmpIndex].cardName;
+                if (thisloc == "played") {
+                    document.getElementById("mypreludes").appendChild(toAdd);
+                    document.getElementById("mypreludes").size = document.getElementById("mypreludes").childNodes.length;
+                } else {
+                    document.getElementById(thisloc).appendChild(toAdd);
+                }
+            }
+        }
+    }
+    // update projects
+    for (var p=0; p < game.cryptState["proj"].length; p++) {
+        for (var i=0; i<locs.length; i++) {
+            thisloc = locs[i];
+            if ((0x100 << i) & game.cryptState["proj"][p]) {
+                var tmpIndex = parseInt(game.deck["proj"][p], 16) & 0xfff;
+                var toAdd = document.createElement("option");
+                toAdd.value = game.deck["proj"][p];
+                // convert number to card name
+                toAdd.innerHTML = cards["proj"][tmpIndex].cardNum + ":" + cards["proj"][tmpIndex].cardName;
+                document.getElementById(thisloc).appendChild(toAdd);
+            }
+        }
+    }
+    // set colonies, if used
+    if (game.colonies.length) {
+        document.getElementById("colonies").innerHTML = "";
+        document.getElementById("colonies").size = game.colonies.length;
+        for (var i=0; i < cards["col"].length; i++) {
+            if (game.colonies.indexOf(cards["col"][i].cardName) == -1) continue;
+            var toAdd = document.createElement("option");
+            var tmp = mask["col"] | i;
+            toAdd.value = tmp.toString(16);
+            toAdd.innerHTML = cards["col"][i].cardName + ":";
+            document.getElementById("colonies").insertBefore(toAdd, document.getElementById("colonies").childNodes[0]);
+        }
+    }
+    // update global events, if turmoil used
+    if (game.options.expansions.indexOf("turmoil") != -1) {
+        document.getElementById("currentGE").innerHTML = "";
+        document.getElementById("comingGE").innerHTML = "";
+        document.getElementById("distantGE").innerHTML = "";
+        for (var e=0; e < game.cryptState["glbl"].length; e++) {
+            if ((game.cryptState["glbl"][e] & 0x1f) == ((1 << game.numPlayers) - 1)) {
+                // move Coming to Current
+                document.getElementById("currentGE").innerHTML = document.getElementById("comingGE").innerHTML;
+                // move Distant to Coming
+                document.getElementById("comingGE").innerHTML = document.getElementById("distantGE").innerHTML;
+                // move new glbl to Distant
+                var num = parseInt(game.deck.glbl[e], 16) & 0xfff; 
+                document.getElementById("distantGE").innerHTML = `${cards.glbl[num].cardNum}:${cards.glbl[num].cardName}`;
+            }
+        }
+    }
+}
+
+function logDecrypt(c,csNum, plName) {
+    // csNum is position in deck
+    if (c.length > 5) {
+        textBoxAppend("boxLog", "Bad decryption");
+    } else {
+        var cnum = parseInt(c, 16); 
+        var num = cnum & 0xfff;
+        // cnum is numeric card position in master deck, along with decktype
+        // reminder 0x1nnn are projects
+        //          0x2nnn are corporations
+        //          0x4nnn are preludes
+        // num is numeric card position in appropriate master deck
+        for (var dt of deckType) {
+            if (cnum & mask[dt]) {
+                //textBoxAppend("boxLog", `Decoded ${dt} ${num}`);
+                if (dt == "glbl") {
+                    // move global cards to correct spots
+                    // move Coming to Current
+                    document.getElementById("currentGE").innerHTML = document.getElementById("comingGE").innerHTML;
+                    // move Distant to Coming
+                    document.getElementById("comingGE").innerHTML = document.getElementById("distantGE").innerHTML;
+                    // move new glbl to Distant
+                    document.getElementById("distantGE").innerHTML = `${cards[dt][num].cardNum}:${cards[dt][num].cardName}`;
+                    textBoxAppend("boxLog", `New Global Event ${dt}:${csNum} which is ${cards[dt][num].cardNum}:${cards[dt][num].cardName}`,true);
+                } else if (game.postState[dt][csNum] == 0) {
+                    // only mark 'dealt' if card was not to us (postState == 0)
+                    if ((0xf00 & game.cryptState[dt][csNum])  == 0) {
+                        game.cryptState[dt][csNum] |= 0x100; // mark dealt
+                    }
+                    textBoxAppend("boxLog", `We were dealt ${dt}:${csNum} which is ${cards[dt][num].cardNum}:${cards[dt][num].cardName}`);
+                } else if (game.postState[dt][csNum] & 8) {
+                    // this was a reveal
+                    textBoxAppend("boxLog", `${plName} revealed ${dt}:${csNum} which is ${cards[dt][num].cardNum}:${cards[dt][num].cardName}`);
+                } else {
+                    // post card info to log
+                    textBoxAppend("boxLog", `${plName} played ${dt}:${csNum} which is ${cards[dt][num].cardNum}:${cards[dt][num].cardName}`,true);
+                }
+            }
+        }
+    } 
+}                    
+
+function postDecrypts() {
+    // assemble object with decrypt codes for other players
+    var decObj = JSON.parse(decObjTemplate);
+    decObj.decrypt.name = game.myName;
+    var postFlag = false;
+    // decrypt codes for other players corps
+    for (var co=0; co < game.postState["corp"].length; co++) {
+        if ((Number(game.postState["corp"][co]) & 0x1)) {
+            decObj.decrypt.corp[co.toString()] = game.corpDec[co];
+            postFlag = true;
+        }
+    }
+    for (var prel=0; prel < game.postState["prel"].length; prel++) {
+        if ((Number(game.postState["prel"][prel]) & 0x1)) {
+            decObj.decrypt.prel[prel.toString()] = game.prelDec[prel];
+            postFlag = true;
+        }
+    }
+    for (var proj=0; proj < game.postState["proj"].length; proj++) {
+        if ((Number(game.postState["proj"][proj]) & 0x1)) {
+            decObj.decrypt.proj[proj.toString()] = game.projDec[proj];
+            postFlag = true;
+        }
+    }
+    for (var glbl=0; glbl < game.postState["glbl"].length; glbl++) {
+        if ((Number(game.postState["glbl"][glbl]) & 0x1)) {
+            decObj.decrypt.glbl[glbl.toString()] = game.glblDec[glbl];
+            postFlag = true;
+        }
+    }
+    if (postFlag) {
+        textBoxAppend("copyPasteBox", `[size=5]:::${JSON.stringify(decObj)}:::[/size]` );
+    }
+    return(postFlag);
+}
+
+function postUpdate() {
+    // assemble object with 
+    //updateObjTemplate = '{"update":{"name":"","hand":{"corp":[],"prel":[],"proj":[]},"discard":{"corp":[],"prel":[],"proj":[]},"played":{"corp":[],"prel":[],"proj":[]}}}';
+    var updateObj = JSON.parse('{"update":{"name":""}}');
+    updateObj.update.name = game.myName;
+    var postFlag = false;
+    for (var i = 1; i<locs.length; i++) {
+        var thisloc = document.getElementById(locs[i]);
+        for (var e=0; e < thisloc.childNodes.length; e++) {
+            var thisChildValue = thisloc.childNodes[e].value;
+            var thisCardNum = parseInt(thisChildValue, 16);
+            var thisCardDeckPos;
+            if (thisloc.childNodes[e].innerHTML.substr(0,1) == '*') {
+                // only update if card is marked as moved
+                for (var dt of deckType) {
+                    if (thisCardNum & mask[dt]) {
+                        thisCardDeckPos = game.deck[dt].indexOf(thisloc.childNodes[e].value);
+                        if (!updateObj.update.hasOwnProperty(locs[i])) {
+                            updateObj.update[locs[i]] = {};
+                        }
+                        if (!updateObj.update[locs[i]].hasOwnProperty(dt)) {
+                            updateObj.update[locs[i]][dt] = [];
+                        }
+                        updateObj.update[locs[i]][dt].push(thisCardDeckPos);
+                        postFlag = true;
+                        if (locs[i] == "played") {
+                            // card moved to played so also post decrypt
+                            game.postState[dt][thisCardDeckPos] = 5;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (postFlag) {
+        textBoxAppend("copyPasteBox", `:::${JSON.stringify(updateObj)}:::` );
+    }
+    return(postFlag);
+}
+
+
+function textBoxClear(boxname) {
+    document.getElementById(boxname).value = "";
+}
+
+function textBoxAppend(boxname, i, force) {
+    if (force || (appMode != "restart")) {
+        document.getElementById(boxname).value += i + "\n";
+        document.getElementById(boxname).scrollTop = document.getElementById(boxname).scrollHeight;
+    }
+}
+
+function saveGame() {
+    if (typeof(Storage) !== "undefined") {
+        var tn = threadNum.toString();
+        lclThreads.push(tn);
+        localStorage.setItem("thread" + tn, JSON.stringify(game));
+    }
+}
+
+function loadDoc(thread, count, minId) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                var tmp = this.responseText;
+                var tmpdoc = this.responseXML;
+                lastArticle = "";
+                //var bodies = tmpdoc.getElementsByTagName("body");
+                tmp = tmp.replace(/&quot;/g, '\"');
+                tmp = tmp.replace(/&gt;/g, '>');
+                tmp = tmp.replace(/&lt;/g, '<');
+    
+                var bggStuff = tmp.split(":::");
+                // bggStuff is array of [garbage, data, garbage, data, garbage]
+                // now we remove the garbage
+                var g=0;
+                while (g < bggStuff.length) {
+                    bggStuff.splice(g, 1);   // throw away garbage
+                    g++;
+                }
+                // process bgg data
+                if (game.state == "init") {
+                    textBoxAppend("boxLog", "Initializing...", true);
+                    for (var xx=0; xx < bggStuff.length; xx++) {
+                        if (bggStuff[xx].indexOf("shuffledBy") != -1) break;
+                        processBggInit(bggStuff[xx]);
+                    }
+                    if (!game.numPlayers) {
+                        window.alert("I didn't find any player names. Double check thread #.");
+                        return;
+                    }
+                    // extract thread name (subject)
+                    game.threadName = tmpdoc.getElementsByTagName("subject")[0].innerHTML;
+                    document.getElementById("threadname").innerHTML = game.threadName;
+                    if (typeof(Storage) !== "undefined") {
+                        var tn = threadNum.toString();
+                        if (!lclThreads.includes(tn)) {
+                            lclThreads.push(tn);
+                            localStorage.cryptoThreads = JSON.stringify(lclThreads);
+                        }
+                        localStorage.setItem("thread" + tn, JSON.stringify(game));
+                    } else {
+                        window.alert("Your browser does not support local storage. Nothing will be saved!")
+                    }
+                    
+                    if (!rebuild) {
+                        // get player name
+                        document.getElementById("myname").style.display = "block";
+                        
+                        // note: Code continues in clickNameSelected
+                    } else {
+                        document.getElementById("myname").style.display = "block";
+                        rebuild = false;
+                        setTimeout(afterNameSelected, 200);
+                        // note: Code continues in afterNameSelected
+                    }
+                        
+                    
+                }
+                // deal with game options
+                if (Number(game.options.numColonies)) {
+                    //setClassDisplay("dispcol", "table-cell");
+                } else {
+                    setClassDisplay("dispcol", "none");
+                }
+                if (game.options.expansions.indexOf("prelude") != -1) {
+                    //setClassDisplay("dispprel", "table-cell");
+                    //setClassDisplay("prelblock", "block");
+                } else {
+                    setClassDisplay("dispprel", "none");
+                    setClassDisplay("prelblock", "none");
+                }
+                if (game.options.expansions.indexOf("turmoil") != -1) {
+                    //setClassDisplay("dispglbl", "table-cell");
+                    //setClassDisplay("glblblock", "block");
+                } else {
+                    setClassDisplay("dispglbl", "none");
+                    setClassDisplay("glblblock", "none");
+                }
+                // create master lists of cards
+                if (masterList.corp.length == 0) {
+                    // we haven't created masterLists yet so do that now
+                    for (var dt of deckType) {
+                        // if no Prelude/Turmoil, do not make lists
+                        if ((dt=="prel") && (game.options.expansions.indexOf("prelude") == -1)) continue;
+                        if ((dt=="glbl") && (game.options.expansions.indexOf("turmoil") == -1)) continue;
+                        for (var c=0; c < cards[dt].length; c++) {
+                            var firstChar = cards[dt][c].cardNum.substr(0,1);
+                            if (isNaN(firstChar)) {
+                                // card starts with a letter
+                                if ((firstChar =='P') && (game.options.expansions.indexOf("prelude") == -1)) continue;
+                                if ((firstChar =='C') && (game.options.expansions.indexOf("colonies") == -1)) continue;
+                                if ((firstChar =='X') && (game.options.expansions.indexOf("promo") == -1)) continue;
+                                if ((firstChar =='T') && (game.options.expansions.indexOf("turmoil") == -1)) continue;
+                                if (firstChar =='Z') {
+                                    var pnum = Number(cards[dt][c].cardNum.substr(1));
+                                    if ((pnum > 12) && (pnum < 18) && (game.options.expansions.indexOf("venus") == -1)) continue;
+                                    if ((pnum > 17) && (pnum < 23) && (game.options.expansions.indexOf("prelude") == -1)) continue;
+                                    if ((pnum > 22) && (pnum < 28) && (game.options.expansions.indexOf("colonies") == -1)) continue;
+                                    if ((pnum > 27) && (pnum < 33) && (game.options.expansions.indexOf("turmoil") == -1)) continue;
+                                    if ((pnum > 32) && (pnum < 39) && (game.options.expansions.indexOf("promo") == -1)) continue;
+                                }
+                            } else {
+                                // must be a project check if in venus or promo range
+                                var pnum = Number(cards[dt][c].cardNum);
+                                if ((pnum > 212) && (pnum < 262) && (game.options.expansions.indexOf("venus") == -1)) continue;
+                                if ((pnum > 208) && (pnum < 213) && (game.options.expansions.indexOf("promo") == -1)) continue;
+                            }
+                            
+                            // if this cardNum is on exclude list then skip it
+                            if (game.options.hasOwnProperty('exclude') && (game.options.exclude[dt].indexOf(cards[dt][c].cardNum) != -1)) continue;
+                            var tmp = mask[dt] | c;
+                            masterList[dt].push(tmp.toString(16));
+                        }
+                    }
+                    if (game.options.expansions.indexOf("colonies") != -1) {
+                        for (var c=0; c < cards["col"].length; c++) {
+                            if (game.options.hasOwnProperty('exclude') && (game.options.exclude["col"].indexOf(cards["col"][c].cardNum) != -1)) continue;
+                            masterList["col"].push(cards["col"][c].cardName);
+                        }
+                    }
+                }
+
+                if (game.state == "shuffle") {
+                    textBoxAppend("boxLog", "Processing shuffle...", true);
+                    game.deck["corp"]=[];
+                    game.deck["proj"]=[];
+                    game.deck["prel"]=[];
+                    game.deck["glbl"]=[];
+                    shuffleStr = "";
+        
+                    bggStuff.forEach(processBggDecks);
+                    processShuffleStr();
+                    localStorage.setItem("thread" + threadNum, JSON.stringify(game));
+                }
+                if (game.state == "initialdeal") {
+                    textBoxAppend("boxLog", "Processing initial deal...", true);
+                    // process any decrypt stuff posted
+                    needReshuffle = false;
+                    for (var x=0; x < bggStuff.length; x++) {
+                        // run decryption on any cards needing it
+                    if (!processBggPlay(bggStuff[x])) break; 
+                        if (needReshuffle) break;
+                    }
+                    // if we haven't yet then post codes for initial deal
+                    // do this by checking if any corps await posting
+                    var weAreWaiting = false;
+                    for (var c=0; c < game.postState["corp"].length; c++) {
+                        if ((game.postState["corp"][c] & 0xf) == 1) weAreWaiting = true;
+                    }
+                    if (weAreWaiting) {
+                        // still need to post initial deal
+                        postDecrypts();
+                    } else {
+                        // we have posted initial deal
+                        game.state = "play";
+                        localStorage.setItem("thread" + threadNum, JSON.stringify(game));
+                    };
+                }
+                currPos.proj = game.numPlayers * game.options.projsPerPlayer;
+                currPos.prel = game.numPlayers * game.options.prelsPerPlayer;
+                needReshuffle = false;
+                playedCards = {};
+                document.getElementById("otherplayers").innerHTML = "";
+                for (var p=0; p < game.playerNames.length; p++) {
+                    if (game.playerNames[p] == game.myName) continue;
+                    playedCards[game.playerNames[p]] = {"corp":[], "prel":[], "proj":[]};
+                    var toAdd = document.createElement("button");
+                    toAdd.innerHTML = `Played by ${game.playerNames[p]}`;
+                    toAdd.id = `but_${game.playerNames[p]}`;
+                    toAdd.onclick = function () {clickPlayedByLink()};
+                    toAdd.className = "bigbutt tg-play";
+                    document.getElementById("otherplayers").appendChild(toAdd);
+                }
+                if (game.state == "play") {
+                    var articles = tmpdoc.getElementsByTagName("article");
+                    lastArticle = articles[articles.length-1].id;
+                    var tList = document.getElementsByTagName("table");
+                    for (var t=0; t < tList.length; t++) {
+                        tList[t].style.display = "table";
+                    }
+                    // deal with game options
+                    if (Number(game.options.numColonies)) {
+                        setClassDisplay("dispcol", "table-cell");
+                    } else {
+                        setClassDisplay("dispcol", "none");
+                    }
+                    if (game.options.expansions.indexOf("prelude") != -1) {
+                        setClassDisplay("dispprel", "table-cell");
+                        setClassDisplay("prelblock", "block");
+                    } else {
+                        setClassDisplay("dispprel", "none");
+                        setClassDisplay("prelblock", "none");
+                    }
+                    if (game.options.expansions.indexOf("turmoil") != -1) {
+                        setClassDisplay("dispglbl", "table-cell");
+                        setClassDisplay("glblblock", "block");
+                    } else {
+                        setClassDisplay("dispglbl", "none");
+                        setClassDisplay("glblblock", "none");
+                    }
+                    
+                    textBoxAppend("boxLog", "Processing game play...", true);
+                    // process any decrypt stuff posted
+                    for (var x=0; x < bggStuff.length; x++) {
+                        // run decryption on any cards needing it
+                        // Also handle requests and updates
+                        processBggPlay(bggStuff[x]);
+                        if (needReshuffle) break;
+                    }
+                    if (!needReshuffle) {
+                        // if anything waiting to be posted then post it
+                        postDecrypts();
+                        localStorage.setItem("thread" + threadNum, JSON.stringify(game));
+                    }
+                }
+                // moved to needReshuffle ELSE //processCardStates();
+                if (needReshuffle) {
+                    lastNotFinalized = {};
+                    reshuffleStr = "";
+                    for (var x=0; x < bggStuff.length; x++) {
+                        // TBD here add check for reshuffle and if found process it
+                        var d = bggStuff[x];
+                        if ((d.indexOf("decks") > 0) && (d.indexOf("decks") < 4)) {
+                            // find decks shuffled by all, finalized by none
+                            var tmpObj = JSON.parse(d);
+                            if ((tmpObj.decks.shuffledBy.length == game.numPlayers) && !tmpObj.decks.finalizedBy.length) {
+                                lastNotFinalized = tmpObj;
+                            }
+                        }    
+                        if ((d.indexOf("reshuffled") > 0) && (d.indexOf("reshuffled") < 4)) {
+                            reshuffleStr = d;
+                        }    
+                    }
+                    processReshuffle();
+                } else {
+                    processCardStates();
+                }
+            } else {
+                window.alert(`Error ${this.status} received from BGG`);
+            }
+            
+        }
+    };
+    // for API info https://boardgamegeek.com/wiki/page/BGG_XML_API2
+    var url = "https://www.boardgamegeek.com/xmlapi2/thread?id=" + thread;
+    //if (count) url = url.concat("&count=", count);
+    if (minId) url = url.concat("&minarticleid=", minId);
+    url = url.concat("&",(new Date()).getTime());
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+
+function moveCards(fromObj, toObj) {
+    for (var c=fromObj.childNodes.length-1; c >= 0; c--) {
+        if (fromObj.childNodes[c].selected) {
+            // move selected cards to other list
+            fromObj.childNodes[c].selected = false;
+            if (fromObj.childNodes[c].innerHTML.indexOf('*') != 0) {
+                fromObj.childNodes[c].innerHTML = '*' + fromObj.childNodes[c].innerHTML;
+            }
+            var tmpV = parseInt(fromObj.childNodes[c].value,16);
+            toObj.insertBefore(fromObj.childNodes[c], toObj.childNodes[0]);
+        }
+    }
+    // create copy/paste for played/discard/hand
+    textBoxClear("copyPasteBox");
+    postUpdate();
+    postDecrypts();
+}
+
+function clickCardLink(grp) {
+    var baseURL = "https://ssimeonoff.github.io/cards-list";
+    var fromObj = document.getElementById(grp);
+    var tmpFlag = false;
+    for (var c=0; c < fromObj.childNodes.length; c++) {
+        var tmp = fromObj.childNodes[c].innerHTML;
+        var colonPos = tmp.indexOf(":");
+        if (colonPos < 0) continue;
+        var tmpC = tmp.substring(0,colonPos);
+        tmpC = tmpC.replace(/^\*/,"");
+        tmpC = tmpC.replace(/^Z/,"CORP");
+        baseURL += "#" + tmpC;
+        tmpFlag = true;
+    }
+    if (tmpFlag) window.open(baseURL);
+}
+
+function clickPlayedByLink() {
+    var baseURL = "https://ssimeonoff.github.io/cards-list";
+    var s = event.srcElement.id;
+    var pl = s.slice(4);
+    var pnum = game.playerNames.indexOf(pl);
+    var tmpFlag = false;
+    if (pnum != -1) {
+        for (var i=0; i < 3; i++) {
+            var dt = deckType[i];
+            for (var c=0; c < playedCards[pl][dt].length; c++) {
+                // played cards is array of deck positions
+                var dpos = playedCards[pl][dt][c];
+                // make sure cryptstate shows decrypt by all
+                if ((game.cryptState[dt][dpos] & 0x1f) != ((1 << game.numPlayers)-1)) {
+                    window.alert(`ERROR: undecrypted card ${dt}:${dpos} by ${pl}`);
+                    continue;
+                }
+                // get card position in game.deck
+                var cpos = parseInt(game.deck[dt][dpos], 16) & 0xfff;
+                // lookup cardnum in cards
+                var cnum = cards[dt][cpos].cardNum;
+                // fix corp nums if needed
+                cnum = cnum.replace(/^Z/,"CORP");
+                // append massaged num to URL
+                baseURL += "#" + cnum;
+                tmpFlag = true;
+            }
+        }
+        // pop open URL
+        if (tmpFlag) window.open(baseURL);
+    } else {
+        window.alert(`Error: player ${pl} not found`);
+    }
+}
+
+function clickDealt2Hand() {
+    moveCards(document.getElementById("dealt"), document.getElementById("hand"));
+}
+
+function clickDealt2Discard() {
+    moveCards(document.getElementById("dealt"), document.getElementById("discard"));
+}
+
+function clickHand2Played() {
+    moveCards(document.getElementById("hand"), document.getElementById("played"));
+}
+
+function clickHand2Discard() {
+    moveCards(document.getElementById("hand"), document.getElementById("discard"));
+}
+
+function clickNameSelected() {
+    game.myName = document.getElementById("selectMe").value;
+    afterNameSelected();
+}
+
+function afterNameSelected() {
+    document.getElementById("myname").style.display = "none";
+    // use primeRolls to determine player order/shared primed/random game options
+    myRand = new Math.seedrandom(game.primeRolls);
+    
+    // player order
+    game.playerOrder = [0];
+    for (var i=1; i<game.numPlayers; i++) {
+        game.playerOrder.splice(randomInteger(i+1),0,i);
+    }
+    //textBoxAppend("boxLog", "playerOrder=" + game.playerOrder);
+    var nl = playersOrderString();
+    textBoxAppend("boxLog", `playerOrder=${nl}`, true);
+    textBoxAppend("boxLog", "");
+    
+    // play options 
+    // board? TBD
+    // Colony stuff
+    var tmpColonies = [];
+    for (var c=0; c < masterList["col"].length; c++) {
+        // create array of 0..colonies.length-1 in random order
+        tmpColonies.splice(randomInteger(tmpColonies.length),0,c);
+    }
+    for (var c=0; c < Number(game.options.numColonies); c++) {
+        game.colonies.push(masterList.col[tmpColonies[c]]);
+    }
+    textBoxAppend("boxLog", `colonies in use=${game.colonies}`, true);
+            
+    
+    // shared prime
+    textBoxAppend("boxLog", "Generating shared Prime. This may take awhile.");
+    textBoxAppend("boxLog", "");
+    genPrime(primeBitLength, primeGenerated);
+    
+    // No more code here. Code continues in primeGenerated()
+    
+}
+
+function playersOrderString() {
+    var nl = game.playerNames[game.playerOrder[0]];
+    for (var i=1; i<game.numPlayers; i++) {
+        nl += "," + game.playerNames[game.playerOrder[i]];
+    }
+    return(nl);
+}
+
+function setClassDisplay(c, d) {
+    var tmpList = document.getElementsByClassName(c);
+    for (var i=0; i<tmpList.length; i++) {
+        tmpList[i].style.display = d;
+    }
+}
+
+function clickRequestCards() {
+    // Set 'requests' for next deal (set cards others need to see to state 1)
+    var tmpObj = JSON.parse(reqProjObjTemplate);
+    var reqNum = Number(document.getElementById("reqnum").value);
+    textBoxClear("copyPasteBox");
+    if (reqNum & 0x40) {
+        for (let p of game.playerNames) {
+            tmpObj = {"request":{"name":"", "proj":4}};
+            tmpObj.request.name = p;
+            textBoxAppend("copyPasteBox", `:::${JSON.stringify(tmpObj)}:::`);
+        }
+        return;
+    } else if (reqNum & 0x20) {
+        tmpObj = {"reveal":{"name":"", "proj":1}};
+        tmpObj.reveal.name = game.myName;
+    } else {
+        tmpObj.request.name = game.myName;
+        if (reqNum & 0x7) {
+            tmpObj.request.proj = reqNum & 0x7; 
+        }  
+        if (reqNum & 0x8) {
+            tmpObj.request.prel = 1;
+        }  
+        if (reqNum & 0x10) {
+            tmpObj.request.glbl = game.postState.glbl.indexOf(0);
+        }
+    }
+    textBoxAppend("copyPasteBox", `:::${JSON.stringify(tmpObj)}:::`);
+}
+
+function clickDelete() {
+    if (!confirm("Delete this thread?")) return;
+    var tmpTNum = Number(document.getElementById("gamelist").value);
+    // remove thread from lclThreads
+    lclThreads.splice(lclThreads.indexOf(tmpTNum),1);
+    // save updated list
+    localStorage.cryptoThreads = JSON.stringify(lclThreads);
+    // remove game info for thread
+    localStorage.removeItem("thread" + tmpTNum);
+    location.reload();
+
+}
+
+function clickEvent(ge) {
+    //  handle display of global events
+    var fromGE = document.getElementById(ge + "GE");
+    var gInfo = fromGE.innerHTML.split(":");
+    if (gInfo.length > 2) {
+        // this block is showing flavor text. Remove it
+        fromGE.style.display = "table-cell";
+        fromGE.innerHTML = gInfo[0] + ":" + gInfo[1];
+    } else if (gInfo.length == 2) {
+        // this block is not showing flavor text. Add it
+        for (var g=0; g < cards.glbl.length; g++) {
+            if (gInfo[0] == cards.glbl[g].cardNum) {
+                fromGE.innerHTML += ":<br>" + cards.glbl[g].cardExtra.replace(/\n/g,"<br>");
+            }
+        }
+    } // else we have an empty space. Do nothing
+}
+
+function clickRebuild() {
+    if (!confirm("Rebuild this thread?")) return;
+    var tmpname = game.myName;
+    var tmpseed = game.mySeed;
+    var tmpTNum = Number(document.getElementById("gamelist").value);
+    initAll();
+    game.myName = tmpname;
+    game.mySeed = tmpseed;
+    appMode = "restart";
+    threadNum = tmpTNum;
+    game.state = "init";
+    saveGame();
+    rebuild = true;
+    // load data from BGG to get: primeRolls, playerNames
+    loadDoc(threadNum, 1, 0);
+    
+}
+
+function processShuffleStr() {
+    // after process, if need more shuffling then wait else
+    // continue processing (appMode restart or update)
+    if (shuffleStr == "") {
+        // no shuffled data in forum yet
+        appMode = "update";
+        textBoxAppend("boxLog", "No shuffled decks found. Starting fresh.");
+        game.deck["corp"] = shuffle(masterList["corp"]);
+        game.deck["proj"] = shuffle(masterList["proj"]);
+        game.deck["prel"] = shuffle(masterList["prel"]);
+        game.deck["glbl"] = shuffle(masterList["glbl"]);
+        crypt(game.deck["corp"], game.baseEnc);
+        crypt(game.deck["proj"], game.baseEnc);
+        crypt(game.deck["prel"], game.baseEnc);
+        crypt(game.deck["glbl"], game.baseEnc);
+        // post decks to COPY/PASTE
+        postDecks([game.myName], []);
+    } else {
+        // shuffleStr contains last shuffle data
+        var tmpObj = JSON.parse(shuffleStr);
+        
+        if ((tmpObj.decks.finalizedBy.length > 0) || (tmpObj.decks.shuffledBy.length == game.numPlayers)) {
+            textBoxAppend("boxLog", `Found decks with final encryption by:${tmpObj.decks.finalizedBy}`);
+            if (tmpObj.decks.finalizedBy.length == game.numPlayers) {
+                // everyone is done shuffling/encrypting
+                game.deck["corp"] = tmpObj.decks.corps;
+                game.deck["proj"] = tmpObj.decks.proj;
+                game.deck["prel"] = tmpObj.decks.prel;
+                game.deck["glbl"] = tmpObj.decks.glbl;
+                // decrypt everything using our codes
+                function arrayDecrypt(d, i) {
+                    return decrypt(d, this[i]);
+                }
+                game.deck["corp"] = game.deck["corp"].map(arrayDecrypt, game.corpDec);
+                game.deck["prel"] = game.deck["prel"].map(arrayDecrypt, game.prelDec);
+                game.deck["proj"] = game.deck["proj"].map(arrayDecrypt, game.projDec);
+                game.deck["glbl"] = game.deck["glbl"].map(arrayDecrypt, game.glblDec);
+                // mark all cards as decrypted by this players
+                var thisPl = 1 << game.playerNames.indexOf(game.myName);
+                function initDecrypt() {
+                    return(Number(this));
+                }
+                // these arrays hold decrypt state for each card. A bit marks
+                // if that player's code has decrypted the card already.
+                game.cryptState["corp"] = game.deck["corp"].map(initDecrypt, thisPl);
+                game.cryptState["prel"] = game.deck["prel"].map(initDecrypt, thisPl);
+                game.cryptState["proj"] = game.deck["proj"].map(initDecrypt, thisPl);
+                game.cryptState["glbl"] = game.deck["glbl"].map(initDecrypt, thisPl);
+                // these arrays hold post (posted to BGG) state for each card. 
+                // '1' means code needs to be posted, '2' means that it has been posted.
+                var zero = 0;
+                game.postState["corp"] = game.deck["corp"].map(initDecrypt, zero);
+                game.postState["prel"] = game.deck["prel"].map(initDecrypt, zero);
+                game.postState["proj"] = game.deck["proj"].map(initDecrypt, zero);
+                game.postState["glbl"] = game.deck["glbl"].map(initDecrypt, zero);
+                // Set 'requests' for initial deal (set cards others need to see to state 1)
+                for (var p=0; p < game.numPlayers; p++) {
+                    if (game.options.expansions.indexOf("turmoil") != -1) {
+                        for (var glbl=0; glbl < 2; glbl++) {
+                            game.postState["glbl"][glbl] = 1;
+                        }
+                    }
+                    if (game.playerNames[game.playerOrder[p]] == game.myName) {
+                        continue;
+                    }
+                    for (var co=0; co < Number(game.options.corpsPerPlayer); co++) {
+                        game.postState["corp"][co + game.options.corpsPerPlayer * p] = 1;
+                    }
+                    for (var prel=0; prel < Number(game.options.prelsPerPlayer); prel++) {
+                        game.postState["prel"][prel + game.options.prelsPerPlayer * p] = 1;
+                    }
+                    for (var proj=0; proj < Number(game.options.projsPerPlayer); proj++) {
+                        game.postState["proj"][proj + game.options.projsPerPlayer * p] = 1;
+                    }
+                }
+                // change state to play to start playing
+                game.state = "initialdeal";
+            } else if (!tmpObj.decks.finalizedBy.includes(game.myName)) {
+                // I need to finalize (unencrypt with base then re-encrypt individually)
+                game.deck["corp"] = tmpObj.decks.corps;
+                game.deck["proj"] = tmpObj.decks.proj;
+                game.deck["prel"] = tmpObj.decks.prel;
+                game.deck["glbl"] = tmpObj.decks.glbl;
+                crypt(game.deck["corp"], game.baseDec);
+                crypt(game.deck["proj"], game.baseDec);
+                crypt(game.deck["prel"], game.baseDec);
+                crypt(game.deck["glbl"], game.baseDec);
+                crypt(game.deck["corp"], game.corpEnc);
+                crypt(game.deck["proj"], game.projEnc);
+                crypt(game.deck["prel"], game.prelEnc);
+                crypt(game.deck["glbl"], game.glblEnc);
+                tmpObj.decks.finalizedBy.push(game.myName);
+                appMode = "update";
+                textBoxAppend("boxLog", "Post encrypted decks to forum");
+                // Post decks to forum
+                postDecks(tmpObj.decks.shuffledBy, tmpObj.decks.finalizedBy);
+                // Following removed to ensure final shuffle was posted to forum
+                //if (tmpObj.decks.finalizedBy.length == game.numPlayers) {
+                    //// We were last to do final encrypt
+                    //// change state to play to start playing
+                    //game.state = "initialdeal";
+                //}
+            } else {
+                // waiting on someone else to finalize
+                game.deck["corp"] = tmpObj.decks.corps;
+                game.deck["proj"] = tmpObj.decks.proj;
+                game.deck["prel"] = tmpObj.decks.prel;
+                game.deck["glbl"] = tmpObj.decks.glbl;
+                var x = [];
+                for (i of game.playerNames) {
+                    if (!tmpObj.decks.finalizedBy.includes(i)) x.push(i);
+                }
+                appMode = "update";
+                textBoxAppend("boxLog", `Waiting for final encryption by:${x}`);
+            }
+        } else if (tmpObj.decks.shuffledBy.length > 0) {
+            textBoxAppend("boxLog", `Found decks shuffled by:${tmpObj.decks.shuffledBy}`);
+            //if (tmpObj.decks.shuffledBy.length == game.numPlayers) {
+                //// everyone is done shuffling
+                //// Removed to allow reshuffling
+                //// This state shouldn't exist because if we are last to shuffle we will also do final encrypt
+                //window.alert("There was an error with the shuffle information");
+            //} else 
+            if (!tmpObj.decks.shuffledBy.includes(game.myName)) {
+                // I need to shuffle
+                game.deck["corp"] = shuffle(tmpObj.decks.corps);
+                game.deck["proj"] = shuffle(tmpObj.decks.proj);
+                game.deck["prel"] = shuffle(tmpObj.decks.prel);
+                game.deck["glbl"] = shuffle(tmpObj.decks.glbl);
+                tmpObj.decks.shuffledBy.push(game.myName);
+                //if (tmpObj.decks.shuffledBy.length == game.numPlayers) {
+                    //// I was last to shuffle, encrypt with individual codes
+                    //// removed to allow reshuffling
+                    //crypt(game.deck["corp"], game.corpEnc);
+                    //crypt(game.deck["proj"], game.projEnc);
+                    //crypt(game.deck["prel"], game.prelEnc);
+                    //crypt(game.deck["glbl"], game.glblEnc);
+                    //tmpObj.decks.finalizedBy.push(game.myName);
+                //} else {
+                    // there are others still to shuffle
+                    // encrypt with base encryption
+                    crypt(game.deck["corp"], game.baseEnc);
+                    crypt(game.deck["proj"], game.baseEnc);
+                    crypt(game.deck["prel"], game.baseEnc);
+                    crypt(game.deck["glbl"], game.baseEnc);
+                //}
+                appMode = "update";
+                textBoxAppend("boxLog", "Post encrypted decks to forum");
+                // Post decks to forum
+                postDecks(tmpObj.decks.shuffledBy, tmpObj.decks.finalizedBy);
+            } else {
+                // waiting on someone else to shuffle and do base encrypt
+                game.deck["corp"] = tmpObj.decks.corps;
+                game.deck["proj"] = tmpObj.decks.proj;
+                game.deck["prel"] = tmpObj.decks.prel;
+                game.deck["glbl"] = tmpObj.decks.glbl;
+                var x = [];
+                for (i of game.playerNames) {
+                    if (!tmpObj.decks.shuffledBy.includes(i)) x.push(i);
+                }
+                appMode = "update";
+                textBoxAppend("boxLog", `Waiting for shuffling by:${x}`);
+            }
+        }
+        var tmp = 0;
+    }
+
+}
+
+
+function processReshuffle() {
+    // after process, if need more shuffling then wait else
+    // continue processing (appMode restart or update)
+    if (JSON.stringify(lastNotFinalized) === '{}') {
+        window.alert("ERROR:Did not find deck shuffled by all but finalized by none");
+        return;
+    }
+    var tmpObj = {"reshuffled": {"shuffledBy":[],"finalizedBy":[],"proj":[]}};
+    if (reshuffleStr != "") {
+        tmpObj = JSON.parse(reshuffleStr);
+    } else {
+        // no reshuffled data in forum yet        
+        textBoxAppend("boxLog", "No reshuffled decks found. Creating...");
+        //  gather all deleted proj and create a new deck
+        var discardMask = 0x100 << locs.indexOf("discard");
+        for (var i=0; i < game.cryptState.proj.length; i++) {
+            if (game.cryptState.proj[i] & discardMask) {
+                // push this discarded project onto new deck
+                // note, these cards are encoded with baseEnc by all players
+                tmpObj.reshuffled.proj.push(lastNotFinalized.decks.proj[i]);
+            }
+        }
+    }
+    
+    
+    var rebaseEnc = [];
+    var rebaseDec = [];
+    // gen pairs for reshuffling
+    bigIntPrime = bigInt(game.prime, 16);
+    myRand = new Math.seedrandom(game.reseed);
+    var tmpPair = generateRandomKeypair(bigIntPrime);
+    rebaseEnc[0] = tmpPair.enc;
+    rebaseDec[0] = tmpPair.dec;
+    // gen new pairs
+    var reEnc = [];
+    var reDec = [];
+    for (p of tmpObj.reshuffled.proj) {
+        tmpPair = generateRandomKeypair(bigIntPrime);
+        
+        reEnc.push(tmpPair.enc);
+        reDec.push(tmpPair.dec);
+    } 
+    
+    if (tmpObj.reshuffled.finalizedBy.length == game.numPlayers) {
+        // all reshuffling, finalizing done and posted
+        if (tmpObj.reshuffled.proj.length != reDec.length) {
+            window.alert("ERROR:Reshuffle deck and decode lengths not same.")
+            return;
+        }
+        textBoxAppend("boxLog", `Found reshuffle with final encryption by:${tmpObj.reshuffled.finalizedBy}`);
+        for (var c=0; c < reDec.length; c++) {
+            //  append reshuffled to proj deck (after decrypting with our code)
+            game.deck.proj.push(decrypt(tmpObj.reshuffled.proj[c], reDec[c]));
+            //  append reDec in end of game.projDec (also reEnc?)
+            game.projDec.push(reDec[c]); // note: save in case we need to post after playing a card
+            //game.projEnc.push(reEnc[c]);
+            // update cryptState/poststate for new cards
+            game.cryptState.proj.push(1 << game.playerNames.indexOf(game.myName));
+            game.postState.proj.push(0);
+        }
+        //  save new reseed (for a later further reshuffle?!)
+        game.reseed = myRand.int32();
+        // save game state with reshuffled cards
+        localStorage.setItem("thread" + threadNum, JSON.stringify(game));
+    } else {
+        if (tmpObj.reshuffled.shuffledBy.indexOf(game.myName) == -1) {
+            textBoxAppend("boxLog", `Found reshuffle with shuffle done by:${tmpObj.reshuffled.shuffledBy}`);
+            // if I haven't yet, do initial shuffle
+            // remove/replace our baseEnc with new baseEnc and shuffle
+            crypt(tmpObj.reshuffled.proj, game.baseDec);
+            crypt(tmpObj.reshuffled.proj, rebaseEnc);
+            // shuffle uses random not seeded
+            myRand = new Math.seedrandom();
+            tmpObj.reshuffled.proj = shuffle(tmpObj.reshuffled.proj);
+            // add us to reshuffled list
+            tmpObj.reshuffled.shuffledBy.push(game.myName);
+            // post decks to COPY/PASTE
+            textBoxClear("copyPasteBox");
+            textBoxAppend("copyPasteBox", `[size=2]:::${JSON.stringify(tmpObj)}:::[/size]`);
+        } else if (tmpObj.reshuffled.shuffledBy.length != game.numPlayers) {
+            // waiting on ? to do initial shuffle
+            var x = [];
+            for (var i of game.playerNames) {
+                if (!tmpObj.reshuffled.shuffledBy.includes(i)) x.push(i);
+            }
+            textBoxAppend("boxLog", `Waiting for reshuffling by:${x}`);
+        } else if (tmpObj.reshuffled.finalizedBy.indexOf(game.myName) == -1) {
+            textBoxAppend("boxLog", `Found reshuffle with final encryption by:${tmpObj.reshuffled.finalizedBy}`);
+            // shuffling done, need finalizing by me
+            // decrypt using our rebase  
+            crypt(tmpObj.reshuffled.proj, rebaseDec);
+            // encrypt individually, using reEnc
+            crypt(tmpObj.reshuffled.proj, reEnc);
+            // add us to finalized list
+            tmpObj.reshuffled.finalizedBy.push(game.myName);
+            // post decks to COPY/PASTE
+            textBoxClear("copyPasteBox");
+            textBoxAppend("copyPasteBox", `[size=2]:::${JSON.stringify(tmpObj)}:::[/size]`);
+        } else if (tmpObj.reshuffled.finalizedBy.length != game.numPlayers) {
+            // waiting on ? to do finalization
+            var x = [];
+            for (var i of game.playerNames) {
+                if (!tmpObj.reshuffled.finalizedBy.includes(i)) x.push(i);
+            }
+            textBoxAppend("boxLog", `Waiting for reshuffling by:${x}`);
+        }
+    }
+
+}
+
+function postDecks(shBy, fiBy) {
+    var tmpObj = {"decks": {"shuffledBy":[],"finalizedBy":[],"corps":[],"proj":[],"prel":[],"glbl":[]}};
+    tmpObj.decks.corps = game.deck["corp"];
+    tmpObj.decks.proj = game.deck["proj"];
+    tmpObj.decks.prel = game.deck["prel"];
+    tmpObj.decks.glbl = game.deck["glbl"];
+    tmpObj.decks.shuffledBy = shBy;
+    tmpObj.decks.finalizedBy = fiBy;
+    textBoxClear("copyPasteBox");
+    textBoxAppend("copyPasteBox", `[size=2]:::${JSON.stringify(tmpObj)}:::[/size]`);
+}
+
+
+function primeGenerated() {
+    textBoxAppend("boxLog", `shared prime=${game.prime}`);
+            
+    // post player order, game options and common prime to copy/paste box
+    // so player can post to forum
+    textBoxAppend("boxLog", "Post 'Copy Box' info to forum and check everyone has same info");
+    textBoxAppend("boxLog", "Then generate pairs");
+    textBoxClear("copyPasteBox");
+    var nl = playersOrderString();
+    textBoxAppend("copyPasteBox", `playerOrder=${nl}`);
+    textBoxAppend("copyPasteBox", "");
+    textBoxAppend("copyPasteBox", `game options=${JSON.stringify(game.options)}`);
+    textBoxAppend("copyPasteBox", "");
+    textBoxAppend("copyPasteBox", `shared prime=${game.prime}`);
+
+    genPairs();
+    
+    game.state = "shuffle";
+    
+    loadDoc(threadNum, 0, 0);
+
+
+}
+
+function genPairs() {
+    bigIntPrime = bigInt(game.prime, 16);
+    
+    // reseed random generator with our private seed
+    myRand = new Math.seedrandom(game.mySeed);
+    var tmpPair = generateRandomKeypair(bigIntPrime);
+    game.baseEnc[0] = tmpPair.enc;
+    game.baseDec[0] = tmpPair.dec;
+    
+    game.projEnc = [];
+    game.projDec = [];
+    game.corpEnc = [];
+    game.corpDec = [];
+    game.prelEnc = [];
+    game.prelDec = [];
+    game.glblEnc = [];
+    game.glblDec = [];
+    
+    // gen pairs for corporation deck
+    for (p of masterList["corp"]) {
+        tmpPair = generateRandomKeypair(bigIntPrime);
+        game.corpEnc.push(tmpPair.enc);
+        game.corpDec.push(tmpPair.dec);
+    }
+    // gen pairs for project deck
+    for (p of masterList["proj"]) {
+        tmpPair = generateRandomKeypair(bigIntPrime);
+        game.projEnc.push(tmpPair.enc);
+        game.projDec.push(tmpPair.dec);
+    }    
+    // gen pairs for prelude deck
+    for (p of masterList["prel"]) {
+        tmpPair = generateRandomKeypair(bigIntPrime);
+        game.prelEnc.push(tmpPair.enc);
+        game.prelDec.push(tmpPair.dec);
+    }
+    // gen pairs for global event deck
+    for (p of masterList["glbl"]) {
+        tmpPair = generateRandomKeypair(bigIntPrime);
+        game.glblEnc.push(tmpPair.enc);
+        game.glblDec.push(tmpPair.dec);
+    }
+    
+    game.reseed = myRand.int32(); 
+    
+    return;
+}
+
+function addGameToList(tnum) {
+    var toAdd = document.createElement("option");
+    toAdd.value = tnum;
+    toAdd.innerHTML = "Thread:" + tnum;
+    document.getElementById("gamelist").appendChild(toAdd);
+}
+
+function copyToClipboard() {
+    // Note: this code from https://www.w3schools.com/howto/howto_js_copy_clipboard.asp
+  var copyText = document.getElementById("copyPasteBox");
+
+  /* Select the text field */
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+  /* Copy the text inside the text field */
+  document.execCommand("cut");
+  if (document.getElementById("openbgg").checked) {
+      if (lastArticle) { // thread/2445801/article/35192044#35192044
+          window.open("https://boardgamegeek.com/thread/" + threadNum + "/article/" + lastArticle + "#" + lastArticle);  
+      } else {
+          window.open("https://boardgamegeek.com/thread/" + threadNum);  
+      }
+  }
+}
+
+var myRand = new Math.seedrandom();
+
+initAll();
+
+   //generate a prime
+   textBoxClear("copyPasteBox");
+   var lclThreads = [];
+    if (typeof(Storage) !== "undefined") {
+        try {
+            lclThreads = JSON.parse(localStorage.cryptoThreads);
+            
+            // add stored threads to selector input
+            
+            lclThreads.forEach(addGameToList);
+        }  
+        catch (err) {
+            localStorage.cryptoThreads = JSON.stringify(lclThreads);
+        }
+    } 
+
+</script>
+
+<!--
+<canvas id="fullsheet" width="90" height="840"></canvas>
+-->
+<!-- Default Statcounter code for Tm_crypto
+https://sliceofbread.neocities.org/tm/tm_crypto.html -->
+<script type="text/javascript">
+var sc_project=12240590; 
+var sc_invisible=0; 
+var sc_security="1cc41df1"; 
+var scJsHost = "https://";
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost+
+"statcounter.com/counter/counter.js'></"+"script>");
+</script>
+<noscript><div class="statcounter"><a title="Web Analytics
+Made Easy - StatCounter" href="https://statcounter.com/"
+target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/12240590/0/1cc41df1/0/"
+alt="Web Analytics Made Easy -
+StatCounter"></a></div></noscript>
+<!-- End of Statcounter Code -->
+
+
+
+</body>
+</html>
