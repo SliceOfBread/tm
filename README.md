@@ -1,4 +1,4 @@
-# tm
+# tm - terraforming mars apps
 Various projects revolving around the game terraforming mars
 Try them at https://sliceofbread.neocities.org/
 
@@ -16,3 +16,4 @@ automatm.html - same as above but with 'AI' bots that can play
 tm_crypto.html - supports people who use Play By Forum (PBF) on BGG
 - uses crypto to allow a people to play without a trusted third party dealer
 - uses the BGG PBF forum for state storage
+- this is essentially an implementation of Mental Poker
